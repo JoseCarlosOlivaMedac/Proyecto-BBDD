@@ -50,6 +50,9 @@
 <style scoped>
 .productos-destacados {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     text-align: center;
     background-color: #333;
     margin: 1rem 0;
@@ -63,16 +66,16 @@ h2 {
 }
 
 .productos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 80px;
+    justify-content: center; 
     align-items: center;
-    align-items: stretch;
-    margin: 0 20px;
+    margin: 0 auto; 
 }
-
 .producto {
+  width: 300px;
+  height: 420px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
