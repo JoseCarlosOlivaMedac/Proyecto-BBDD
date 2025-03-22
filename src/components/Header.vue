@@ -12,14 +12,15 @@
         <i class="fas fa-bars"></i>
       </button>
       <nav :class="{ 'nav-menu': true, 'show': isMenuOpen }">
-        <ul>
+       
         <!--Aqui hay que sustituir los # por la direccion que desarrollaremos posteriormente , es decir las vistas
           Eso lo haremos con el enrutador de vue es decir la etiqueta router-link to ='' -->
-          <li><a href="#"><i class="fas fa-home"></i> Inicio</a></li>
-          <li><router-link to="/productos"><i class="fas fa-store"></i> Productos</router-link></li>
-          <li><router-link to="/carrito"><i class="fas fa-shopping-cart"></i> Carrito</router-link></li>
-          <li><router-link to="/login"><i class="fas fa-user"></i> Iniciar Sesión</router-link></li>
-        </ul>
+          <ul>
+        <li><router-link to="/">Inicio</router-link></li>
+        <li><router-link to="/productos">Productos</router-link></li>
+        <li><router-link to="/carrito">Carrito</router-link></li>
+        <li><router-link to="/login">Login</router-link></li>
+      </ul>
       </nav>
     </header>
   </template>
