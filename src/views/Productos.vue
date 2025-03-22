@@ -21,6 +21,11 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
+//Aqui he importado una api de imagenes de camisetas para que se muestren en la pagina de productos
+//Aqui he creado un array de productos 
+//Aqui he creado una variable de error para que si no se cargan los productos muestre un mensaje de error
+//Aqui he creado una funcion para que se carguen las imagenes de la api
+//En caso de que no funcione bien lo revisamos !
 const isVisible = ref(true);
 const productos = ref([]);
 const error = ref(null);
@@ -77,7 +82,7 @@ onMounted(() => {
 .productos {
   background-color: #f4f4f4;
   display: flex;
-  flex-direction: column; /* Organiza los elementos en columna */
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
   padding: 2rem 0;
@@ -127,8 +132,14 @@ h2 {
   height: 200px;
   object-fit: cover;
   border-radius: 8px;
+  transition: transform 0.3s ease, width 0.3s ease;
 }
 
+.producto img:hover {
+  cursor: pointer;
+  width: 105%;
+  transform: scale(1.1); 
+}
 .producto h3 {
   font-size: 1.2rem;
   margin: 1rem 0;
@@ -137,7 +148,7 @@ h2 {
 .producto p {
   font-size: 1rem;
   color: #666;
-  flex-grow: 1; /* Hace que la descripción ocupe el espacio disponible */
+  flex-grow: 1; 
 }
 
 .precio {

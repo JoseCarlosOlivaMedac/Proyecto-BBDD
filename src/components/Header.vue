@@ -1,45 +1,50 @@
 <template>
-    <header>
-      <div class="logo">
-        <h1><i class="fas fa-tshirt"></i> LIVE SHOP</h1>
-      </div>
-      <button
-        class="menu-burger"
-        aria-label="Abrir menú"
-        :aria-expanded="isMenuOpen"
-        @click="toggleMenu"
-      >
-        <i class="fas fa-bars"></i>
-      </button>
-      <nav :class="{ 'nav-menu': true, 'show': isMenuOpen }">
-       
-        <!--Aqui hay que sustituir los # por la direccion que desarrollaremos posteriormente , es decir las vistas
-          Eso lo haremos con el enrutador de vue es decir la etiqueta router-link to ='' -->
-          <ul>
-        <li><router-link to="/">Inicio</router-link></li>
-        <li><router-link to="/productos">Productos</router-link></li>
-        <li><router-link to="/carrito">Carrito</router-link></li>
-        <li><router-link to="/login">Login</router-link></li>
+  <header>
+    <div class="logo">
+      <h1><i class="fas fa-tshirt"></i> LIVE SHOP</h1>
+    </div>
+    <button
+      class="menu-burger"
+      aria-label="Abrir menú"
+      :aria-expanded="isMenuOpen"
+      @click="toggleMenu"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+    <nav :class="{ 'nav-menu': true, 'show': isMenuOpen }">
+      <ul>
+        <li><i class="fas fa-home"></i> <router-link to="/">Inicio</router-link></li>
+        <li><i class="fas fa-shopping-bag"></i> <router-link to="/productos">Productos</router-link></li>
+        <li><i class="fas fa-shopping-cart"></i> <router-link to="/carrito">Carrito</router-link></li>
+        <li><i class="fas fa-user"></i> <router-link to="/login">Login</router-link></li>
       </ul>
-      </nav>
-    </header>
-  </template>
-  
-  <script setup>
-  import { ref } from "vue";
-  
-  // Estado del menú
-  const isMenuOpen = ref(false);
-  
-  // Alternar menú
-  const toggleMenu = () => {
-    isMenuOpen.value = !isMenuOpen.value;
-  };
-  </script>
-  
+    </nav>
+  </header>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+
+// Estado del menú
+const isMenuOpen = ref(false);
+
+// Alternar menú
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
+
+// Agregar animación al logo al cargar
+onMounted(() => {
+  const logo = document.querySelector(".logo h1");
+  logo.classList.add("animate-logo");
+  setTimeout(() => {
+    logo.classList.remove("animate-logo");
+  }, 1500);
+});
+</script>
+
 <style scoped>
-
-
+/* HEADER */
 header {
   background-color: #222;
   color: #fff;
@@ -50,25 +55,53 @@ header {
   position: relative;
 }
 
+/* LOGO */
 .logo h1 {
   font-size: 1.8rem;
-  margin: 0;
+  margin: 0 50px;
   font-weight: bold;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
 }
 
+/* Animación inicial */
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-logo {
+  animation: popIn 1.2s ease-in-out;
+}
+
+/* Efecto al pasar el mouse */
+.logo h1:hover {
+  transform: rotate(-3deg) scale(1.1);
+}
+
+/* ICONO DEL LOGO */
 .logo i {
-  color: var(--color-primario);
+  color: #fff;
   font-size: 1.5rem;
 }
+.logo:hover {
+  color: #5c36f2;
+}
 
-/* Menú de navegación */
+/* MENÚ DE NAVEGACIÓN */
 nav ul {
   display: flex;
   list-style: none;
-  margin: 0;
+  margin: 0 50px;
   padding: 0;
   gap: 1.5rem;
 }
@@ -78,24 +111,15 @@ nav ul li {
   padding: 8px 12px;
   border-radius: 6px;
   transition: background 0.3s ease-in-out;
-}
-
-
-/* Enlaces */
-nav ul li a {
-  text-decoration: none;
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: bold;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  position: relative;
-  transition: color 0.3s ease-in-out;
 }
 
-nav ul li:hover a {
+/* ICONOS DEL MENÚ */
+nav ul li i {
   color: #5c36f2;
+  font-size: 1.2rem;
 }
 
 /* Línea animada debajo del enlace */
@@ -109,13 +133,25 @@ nav ul li a::after {
   background-color: #5c36f2;
   transition: width 0.3s ease, left 0.3s ease;
 }
-
+/* Expansión desde el centro */
 nav ul li:hover a::after {
   width: 100%;
   left: 0;
 }
+nav ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  position: relative;
+  transition: color 0.3s ease-in-out;
+}
 
-/* Botón menú mobile */
+nav ul li:hover a {
+  color: #5c36f2;
+}
+
+/* MENÚ MOBILE */
 .menu-burger {
   display: none;
   background: none;
@@ -129,8 +165,6 @@ nav ul li:hover a::after {
   z-index: 100;
 }
 
-/* RESPONSIVE */
-/*Aqui seguramente hay que ajustar algun que otro margen , probarlo en vuestros mobiles y me decis ! */
 @media (max-width: 900px) {
   .menu-burger {
     display: block;
