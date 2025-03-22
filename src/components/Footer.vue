@@ -7,15 +7,28 @@
             <li><a href="#"><i class="fas fa-shield-alt"></i> Política de Privacidad</a></li>
             <li><a href="#"><i class="fas fa-file-contract"></i> Términos y Condiciones</a></li>
         </ul>
-        <p>&copy; 2025 Live Shop. Todos los derechos reservados.</p>
+        <div class="footer-content">
+      <p>&copy; 2025 Live Shop. Todos los derechos reservados.</p>
+      <button @click="openModal" class="terms-btn">Términos y Condiciones</button>
+    </div>
+
+    <!-- Modal de Términos y Condiciones -->
+    <TermsModal ref="termsModal" />
     </footer>
 </template>
 
 
 <script setup>
+import { ref } from 'vue';
+import TermsModal from './TermsModal.vue';
 
+const termsModal = ref(null);
+
+// Función para abrir el modal
+const openModal = () => {
+  termsModal.value.openModal();
+};
 </script>
-
 <style scoped>
 footer {
     background-color: #222;

@@ -1,6 +1,6 @@
 <template>
   <section class="productos" v-if="isVisible">
-    <button class="btn-close" @click="closeView">X</button>
+    <button class="btn-close" @click="closeView">✖</button>
     <h2>PRODUCTOS</h2>
     <div v-if="error" class="error-message">{{ error }}</div>
     <div v-else class="productos-grid">
@@ -181,13 +181,26 @@ h2 {
   top: 10px;
   right: 10px;
   background: none;
+  margin-right: 150px;
+  margin-top: 50px;
   border: none;
   color: #333;
   font-size: 1.5rem;
   cursor: pointer;
 }
 
+@media screen and (max-width: 768px) {
+  .btn-close {
+    margin: auto;
+  }
+
+  .producto {
+    width: 100%;
+  }
+  
+}
+
 .btn-close:hover {
-  color: #e67d00;
+  color: #e60505;
 }
 </style>

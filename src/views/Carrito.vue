@@ -36,8 +36,10 @@
   import { ref, computed } from 'vue';
   
   // Lista de productos en el carrito
-  const carrito = ref([
-    {
+  
+  const carrito = ref([     //Estos 2 productos estan cargados estaticamente para poder estilizarlos
+                            //Queda pendiente levantar la funcionalidad para cargar productos dinamicamente desde "Productos.vue"
+     {
       nombre: "Producto 1",
       descripcion: "Descripción del producto 1",
       precio: 20.0,
@@ -167,10 +169,15 @@
   }
   
   .btn-eliminar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
     background-color: #ff4c4c;
     color: white;
     border: none;
     padding: 0.5rem 1rem;
+    margin: auto;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
