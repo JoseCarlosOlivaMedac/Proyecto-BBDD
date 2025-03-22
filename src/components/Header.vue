@@ -14,11 +14,11 @@
       <nav :class="{ 'nav-menu': true, 'show': isMenuOpen }">
         <ul>
         <!--Aqui hay que sustituir los # por la direccion que desarrollaremos posteriormente , es decir las vistas
-          Eso lo haremos con el enrutador de vue -->
+          Eso lo haremos con el enrutador de vue es decir la etiqueta router-link to ='' -->
           <li><a href="#"><i class="fas fa-home"></i> Inicio</a></li>
-          <li><a href="#"><i class="fas fa-store"></i> Productos</a></li>
-          <li><a href="#"><i class="fas fa-shopping-cart"></i> Carrito</a></li>
-          <li><a href="#"><i class="fas fa-user"></i> Iniciar Sesión</a></li>
+          <li><router-link to="/productos"><i class="fas fa-store"></i> Productos</router-link></li>
+          <li><router-link to="/carrito"><i class="fas fa-shopping-cart"></i> Carrito</router-link></li>
+          <li><router-link to="/login"><i class="fas fa-user"></i> Iniciar Sesión</router-link></li>
         </ul>
       </nav>
     </header>

@@ -4,7 +4,7 @@
       <div class="hero-text" :class="{ 'fade-in': isVisible }">
         <h2>Explora nuestra tienda</h2>
         <p>Conoce nuestra colección exclusiva</p>
-        <a href="#" class="btn-primary">Ver productos</a>
+        <router-link to="/productos" class="btn-primary">Ver productos</router-link>
       </div>
     </div>
   </section>
