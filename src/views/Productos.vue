@@ -116,6 +116,8 @@ h2 {
   font-weight: bold;
   color: #333;
   margin: 0.5rem 0;
+  display: flex;
+  justify-content: center;
 }
 
 .btn-secundary {
