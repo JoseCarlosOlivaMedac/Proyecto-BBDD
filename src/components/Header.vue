@@ -105,25 +105,36 @@ nav ul {
   padding: 0;
   gap: 1.5rem;
 }
-
 nav ul li {
   position: relative;
   padding: 8px 12px;
   border-radius: 6px;
-  transition: background 0.3s ease-in-out;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  transition: color 0.3s ease-in-out;
+  
+ 
 }
 
-/* ICONOS DEL MENÚ */
-nav ul li i {
+nav ul li a {
+  text-decoration: none; /* Elimina el subrayado */
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  position: relative;
+  transition: color 0.3s ease-in-out;
+}
+
+
+/* Aplica el efecto al pasar el ratón sobre <li> o <a> */
+nav ul li:hover a,
+nav ul li:hover i,
+nav ul li a:hover,
+nav ul li a:hover i {
   color: #5c36f2;
-  font-size: 1.2rem;
+  
 }
 
 /* Línea animada debajo del enlace */
-nav ul li a::after {
+nav ul li::after {
   content: "";
   position: absolute;
   bottom: -4px;
@@ -132,23 +143,13 @@ nav ul li a::after {
   height: 2px;
   background-color: #5c36f2;
   transition: width 0.3s ease, left 0.3s ease;
-}
-/* Expansión desde el centro */
-nav ul li:hover a::after {
-  width: 100%;
-  left: 0;
-}
-nav ul li a {
-  text-decoration: none;
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: bold;
-  position: relative;
-  transition: color 0.3s ease-in-out;
+  
 }
 
-nav ul li:hover a {
-  color: #5c36f2;
+/* Expansión desde el centro al hacer hover */
+nav ul li:hover::after {
+  width: 100%;
+  left: 0;
 }
 
 /* MENÚ MOBILE */

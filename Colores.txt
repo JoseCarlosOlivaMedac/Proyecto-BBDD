@@ -1,0 +1,15 @@
+Para este proyecto se ha selecionado 2 colores 
+
+:root {
+  --color-primary: #5c36f2;   /*Aqui he definido los 2 colores con los que vamos a trabajar */
+  --color-secondary: #e67d00;
+}
+
+
+Estos 2 colores son variables entonces cuando querais usarlos solo teneis que poner por ejemplo
+
+background-color:var(--color-primary);
+
+En vez de escribir el codigo del color 
+
+Queda pendiente sustituir los codigos definidos por todo el proyecto por sus respectivas variables
