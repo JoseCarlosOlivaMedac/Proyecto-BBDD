@@ -76,6 +76,20 @@ footer p {
     font-size: 0.9rem;
     opacity: 0.8;
 }
+.terms-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, #4a90e2, #1c3faa);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
 
 /* Responsivo */
 @media (max-width: 600px) {

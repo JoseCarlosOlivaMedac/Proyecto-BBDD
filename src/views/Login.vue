@@ -17,7 +17,7 @@
           <input type="password" id="password" v-model="password" required placeholder="Ingresa tu contraseña">
         </div>
         
-        <div v-if="!isLogin" class="input-group">
+        <div v-if=" !isLogin" class="input-group">
           <label for="name">Nombre Completo</label>
           <input type="text" id="name" v-model="name" required placeholder="Ingresa tu nombre">
         </div>
