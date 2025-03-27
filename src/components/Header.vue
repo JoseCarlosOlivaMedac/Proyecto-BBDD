@@ -16,7 +16,13 @@
         <li><i class="fas fa-home"></i> <router-link to="/">Inicio</router-link></li>
         <li><i class="fas fa-shopping-bag"></i> <router-link to="/productos">Productos</router-link></li>
         <li><i class="fas fa-shopping-cart"></i> <router-link to="/carrito">Carrito</router-link></li>
-        <li><i class="fas fa-user"></i> <router-link to="/login">Login</router-link></li>
+        <li v-if="!user">
+          <i class="fas fa-user"></i> <router-link to="/login">Login</router-link>
+        </li>
+        <li v-else>
+          <i class="fas fa-user"></i> ¡Bienvenido, {{ user.displayName }}!
+          <button @click="logout"><router-link to="/login">Cerrar sesión</router-link></button>
+        </li>
       </ul>
     </nav>
   </header>
@@ -24,6 +30,20 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+
+//Con esto tendremos una instancia de los usuarios y de la autenticacion
+const user = ref(null);
+const auth = getAuth();
+
+// Escuchamos cambios sobre el usuario para autentificarlo
+onAuthStateChanged(auth, currentUser => {
+  if (currentUser) {
+    user.value = currentUser;
+  } else {
+    user.value = null;
+  }
+})
 
 // Estado del menú
 const isMenuOpen = ref(false);
@@ -32,6 +52,16 @@ const isMenuOpen = ref(false);
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
+
+//Funcion para poder cerrar sesion
+const logout = async () => {
+  try {
+    await signOut(auth);
+
+  } catch (error) {
+    console.log("Error al cerrar sesión: ", error)
+  }
+}
 
 // Agregar animación al logo al cargar
 onMounted(() => {
@@ -73,6 +103,7 @@ header {
     transform: scale(0.5);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -93,6 +124,7 @@ header {
   color: #fff;
   font-size: 1.5rem;
 }
+
 .logo:hover {
   color: #5c36f2;
 }
@@ -105,17 +137,19 @@ nav ul {
   padding: 0;
   gap: 1.5rem;
 }
+
 nav ul li {
   position: relative;
   padding: 8px 12px;
   border-radius: 6px;
   transition: color 0.3s ease-in-out;
-  
- 
+
+
 }
 
 nav ul li a {
-  text-decoration: none; /* Elimina el subrayado */
+  text-decoration: none;
+  /* Elimina el subrayado */
   color: #fff;
   font-size: 1.1rem;
   font-weight: bold;
@@ -130,7 +164,7 @@ nav ul li:hover i,
 nav ul li a:hover,
 nav ul li a:hover i {
   color: #5c36f2;
-  
+
 }
 
 /* Línea animada debajo del enlace */
@@ -143,7 +177,7 @@ nav ul li::after {
   height: 2px;
   background-color: #5c36f2;
   transition: width 0.3s ease, left 0.3s ease;
-  
+
 }
 
 /* Expansión desde el centro al hacer hover */
@@ -151,6 +185,7 @@ nav ul li:hover::after {
   width: 100%;
   left: 0;
 }
+
 
 /* MENÚ MOBILE */
 .menu-burger {
@@ -175,7 +210,7 @@ nav ul li:hover::after {
     position: absolute;
     background: rgba(34, 34, 34, 0.95);
     width: 100%;
-    height: 40vh; 
+    height: 40vh;
     z-index: 99;
     top: 0;
     left: 0;

@@ -22,6 +22,8 @@
           <input type="text" id="name" v-model="name" required placeholder="Ingresa tu nombre">
         </div>
 
+        <p v-if="errorMessage">{{ errorMessage }}</p>
+
         <button type="submit" class="btn-auth">
           {{ isLogin ? "Iniciar Sesión" : "Registrarse" }}
         </button>
@@ -36,34 +38,98 @@
 </template>
 
 <script setup>
+
+//Imports 
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, setDoc, doc } from "../firebase" // Importa las funciones necesarias
+import { updateProfile } from "firebase/auth";
 
+//Objetos reactivos
 const email = ref("");
 const password = ref("");
 const name = ref("");
 const isLogin = ref(true); // Alternar entre Login y Registro
 const router = useRouter();
+const errorMessage = ref(""); //Muestra mensajes de errores
 
 const cerrarVista = () => {
   router.push("/");
 };
 
-const submitForm = () => {
-  if (isLogin.value) {
-    console.log("Iniciando sesión con:", email.value, password.value);
-  } else {
-    console.log("Registrando usuario:", name.value, email.value, password.value);
+//Envio del formulario 
+const submitForm = async () => {
+
+  try {
+    if (isLogin.value) {
+
+      //Parte para iniciar sesión
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email.value,
+        password.value
+      );
+
+      console.log("Usuario autentificado: ", userCredential.user)//Comprobamos que ha funcionado correctamente 
+      router.push("/") //Volvemos a la pagina principal
+
+    } else {
+      
+      //Registro de nuevos usuarios
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email.value,
+        password.value
+      );
+      const user = userCredential.user;
+
+      //Actualizamos el perfil del usuario asignandole un nombre
+      updateProfile(user, {displayName: name.value});
+
+      //Guardamos los datos del usuario en Firestore
+      setDoc(doc(db, "users", user.uid), {
+        name: name.value,
+        email: email.value,
+        createdAt: new Date(),
+      })
+
+      console.log("Usuario registrado: ", user); //Comprobamos que se ha registrado
+      router.push("/") //Volvemos a la pagina principal
+    }
+  } catch (error) {
+    handleAuthError(error); //Llamamos a esta funcion para que pueda funcionar el switch
+    console.log("Error: ", error)
   }
 };
 
 const toggleAuthMode = () => {
   isLogin.value = !isLogin.value;
 };
+
+//Funcion para mostrar los diferentes errores que podamos tener iniciando sesión 
+const handleAuthError = (error) => {
+  switch (error.code) {
+    case "auth/invalid-credential":
+        errorMessage.value = "❌ Usuario o contraseña incorrectos."
+        break;
+    case "auth/user-not-found":
+      errorMessage.value = "❌ No existe una cuenta con este correo.";
+      break;
+    case "auth/email-already-in-use":
+      errorMessage.value = "❌ Este correo ya está registrado.";
+      break;
+    case "auth/weak-password":
+      errorMessage.value = "❌ La contraseña debe tener al menos 6 caracteres.";
+      break;
+    default:
+      errorMessage.value = "❌ Ocurrió un error. Verifica tus datos.";
+      break;
+  }
+};
+
 </script>
 
 <style scoped>
-
 .auth {
   width: 100%;
   height: 100vh;
@@ -175,6 +241,7 @@ p span:hover {
     transform: translateY(-20px);
     opacity: 0;
   }
+
   100% {
     transform: translateY(0);
     opacity: 1;
