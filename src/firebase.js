@@ -4,10 +4,11 @@ import { getFirestore } from "firebase/firestore";
 import { getDatabase, ref, set } from "firebase/database";
 import { getAnalytics } from "firebase/analytics"; 
 import { getAuth } from "firebase/auth";
+const apiKey = import.meta.env.VITE_API_KEY
 
 // Configuración de Firebase 
 const firebaseConfig = {
-  apiKey: "AIzaSyAviwRWYNFmHFys-CLHJEckqFxlqkGv1Ho",
+  apiKey: "VITE_API_KEY",
   authDomain: "medac-proyectobbdd.firebaseapp.com",
   projectId: "medac-proyectobbdd",
   storageBucket: "medac-proyectobbdd.firebasestorage.app",
