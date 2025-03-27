@@ -4,7 +4,7 @@
     <h2>PRODUCTOS</h2>
     <div v-if="error" class="error-message">{{ error }}</div>
     <div v-else class="productos-grid">
-      <div v-for="(producto, index) in productos" :key="index" class="producto">
+      <div v-for="(producto, index) in productos" :key="producto.id" class="producto">
         <img :src="producto.imagen" :alt="`Imagen de ${producto.nombre}`" />
         <h3>{{ producto.nombre }}</h3>
         <p>{{ producto.descripcion }}</p>
@@ -20,53 +20,30 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { db } from "../firebase";
+import { collection, getDocs, doc } from "firebase/firestore";
 
-//Aqui he importado una api de imagenes de camisetas para que se muestren en la pagina de productos
-//Aqui he creado un array de productos 
-//Aqui he creado una variable de error para que si no se cargan los productos muestre un mensaje de error
-//Aqui he creado una funcion para que se carguen las imagenes de la api
-//En caso de que no funcione bien lo revisamos !
 const isVisible = ref(true);
-const productos = ref([]);
-const error = ref(null);
-const API_URL =
-  "https://api.unsplash.com/search/photos?query=t-shirt&client_id=4Qf3YPiBHlSk0tCpYdgMHIfdrB6HXwsc7Sq0zClBttI";
+const productos = ref ([]);
+const error = ref (null);
 
-const fetchImages = async () => {
+//Función para cargar productos desde Firestore.
+const fetchProductosBbdd = async () => {
   try {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error("Error al cargar los productos");
-    const data = await response.json();
-    
-    // Extraemos solo los resultados de la búsqueda
-    productos.value = data.results.filter(isShirt).map((image, index) => ({
-      nombre: `Producto ${index + 1}`,
-      descripcion: `Descripción del producto ${index + 1}`,
-      precio: (index + 1) * 10,
-      imagen: image.urls.small,
-    }));
+    const queryDatos = await getDocs(collection(db,"productos"));
+      //Mapeamos los documentos a un formato adecuado.
+    productos.value = queryDatos.docs.map (doc => ({ id: doc.id, ...doc.data() }));
 
-    console.log("Productos cargados:", productos.value);
-  } catch (err) {
-    error.value = "No se pudieron cargar los productos. Inténtalo de nuevo más tarde.";
-    console.error("Error fetching images:", err);
+  }catch (error){
+    error.value = "No se pudieron cargar los productos desde Firestore. Inténtalo de nuevo más tarde." + error.message;
+    console.error ("Error trayendo productos de firestore:",error);
   }
 };
 
-const isShirt = (image) => {
-  const description = image.description?.toLowerCase() || "";
-  const altDescription = image.alt_description?.toLowerCase() || "";
-  return (
-    description.includes("shirt") ||
-    description.includes("t-shirt") ||
-    altDescription.includes("shirt") ||
-    altDescription.includes("t-shirt")
-  );
-};
-
+//Aqui va el desarrollo de la lógica de agregar productos al carrito.
 const agregarAlCarrito = (producto) => {
-  console.log("Producto agregado:", producto);
-};
+  console.log("Producto agregado:",producto);
+}
 
 const router = useRouter();
 const closeView = () => {
@@ -74,7 +51,7 @@ const closeView = () => {
 };
 
 onMounted(() => {
-  fetchImages();
+  fetchProductosBbdd();
 });
 </script>
 
