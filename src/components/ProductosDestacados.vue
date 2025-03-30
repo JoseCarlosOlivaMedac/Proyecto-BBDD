@@ -2,106 +2,143 @@
   <section class="productos-destacados">
     <h2>Productos Destacados</h2>
     
-    <!-- Mensaje de carga mientras se obtienen los productos -->
+    <!-- Notificación de producto agregado -->
+    <div v-if="showNotification" class="notification">
+      {{ notificationMessage }}
+    </div>
+    
     <div v-if="loading" class="loading-message">Cargando productos destacados...</div>
-    
-    <!-- Mensaje de error en caso de fallo al cargar los productos -->
     <div v-else-if="error" class="error-message">{{ error }}</div>
-    
-    <!-- Grid de productos que se muestra cuando los productos están disponibles -->
     <div v-else class="productos-grid">
       <div 
         v-for="producto in productos.slice(0, 4)" 
         :key="producto.id" 
         class="producto"
       >
-        <!-- Contenedor de la imagen del producto -->
         <div class="producto-imagen-container">
           <img 
             :src="producto.imagenUrl || placeholderImage" 
             :alt="producto.nombre"
-            @error="handleImageError" 
+            @error="handleImageError"
           />
         </div>
         
-        <!-- Nombre y descripción del producto -->
         <h3>{{ producto.nombre }}</h3>
         <p>{{ producto.descripcion }}</p>
-        
-        <!-- Precio del producto formateado -->
         <span class="precio">${{ formatPrice(producto.precio) }}</span>
         
-        <!-- Componente para agregar el producto al carrito -->
-        <ButtonCarrito :productoId="producto.id" />
+        <ButtonCarrito 
+          :productoId="producto.id" 
+          @producto-agregado="handleProductoAgregado"
+          @error-carrito="handleErrorCarrito"
+        />
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';  // Importa 'ref' para declarar reactivas y 'onMounted' para ejecutar código cuando el componente se monta
-import { db } from '../firebase';  // Importa la configuración de Firebase para usar la base de datos en tiempo real
-import { ref as dbRef, get } from 'firebase/database';  // Importa las funciones necesarias para acceder a la base de datos de Firebase
-import ButtonCarrito from './ButtonCarrito.vue';  // Importa el componente ButtonCarrito para ser usado dentro del template
+import { ref, onMounted, onUnmounted } from 'vue';
+import { db } from '../firebase';
+import { ref as dbRef, get } from 'firebase/database';
+import ButtonCarrito from './ButtonCarrito.vue';
 
 // Variables reactivas
-const productos = ref([]);  // Arreglo para almacenar los productos obtenidos de Firebase
-const loading = ref(true);  // Estado que indica si los productos están siendo cargados
-const error = ref(null);  // En caso de error, se almacena el mensaje de error aquí
-const placeholderImage = '/imagenes/placeholder.jpg';  // Imagen por defecto si falla la carga de una imagen
+const productos = ref([]);
+const loading = ref(true);
+const error = ref(null);
+const placeholderImage = '/imagenes/placeholder.jpg';
+const showNotification = ref(false);
+const notificationMessage = ref('');
+const notificationTimeout = ref(null);
 
-// Función asincrónica para obtener los productos de la base de datos de Firebase
+// Función para obtener productos
 const fetchProductos = async () => {
   try {
-    loading.value = true;  // Marca el inicio de la carga
-    error.value = null;  // Resetea el error
+    loading.value = true;
+    error.value = null;
 
-    // Realiza una consulta para obtener los productos de la base de datos de Firebase
     const snapshot = await get(dbRef(db, 'productos'));
 
-    // Si existen productos, se procesan y se asignan al arreglo 'productos'
     if (snapshot.exists()) {
       productos.value = Object.entries(snapshot.val()).map(([id, data]) => ({
         id,
-        ...data,  // Se extienden los datos del producto con el ID
-        imagenUrl: getImageUrl(id)  // Genera la URL de la imagen para cada producto
+        ...data,
+        imagenUrl: getImageUrl(id)
       }));
     } else {
       console.log("No hay productos disponibles.");
-      productos.value = [];  // Si no hay productos, se asigna un arreglo vacío
+      productos.value = [];
     }
   } catch (err) {
     console.error("Error al obtener productos:", err);
-    error.value = "Error al cargar productos destacados";  // Asigna un mensaje de error si ocurre un problema
+    error.value = "Error al cargar productos destacados";
   } finally {
-    loading.value = false;  // Marca la carga como completada
+    loading.value = false;
   }
 };
 
-// Función para generar la URL de la imagen de un producto, basándose en su ID
+// Función para generar URL de imagen
 const getImageUrl = (productId) => {
-  // Extrae el número del ID del producto (ej: "producto1" -> 1)
-  const num = parseInt(productId.replace(/\D/g, '')) || 1;  // Asegura que siempre se extrae un número válido
-  return `/imagenes/producto(${Math.min(num, 20)}).jpg`;  // Devuelve la URL de la imagen asegurando que no sea mayor a 20
+  const num = parseInt(productId.replace(/\D/g, '')) || 1;
+  return `/imagenes/producto(${Math.min(num, 20)}).jpg`;
 };
 
-// Función para formatear el precio de un producto a formato de moneda (España)
+// Función para formatear precio
 const formatPrice = (price) => {
-  return Number(price).toLocaleString("es-ES");  // Formatea el precio en formato numérico de España
+  return Number(price).toLocaleString("es-ES");
 };
 
-// Función que maneja el error de carga de imágenes, mostrando una imagen por defecto en caso de error
+// Manejo de errores de imagen
 const handleImageError = (event) => {
-  event.target.src = placeholderImage;  // Asigna la imagen por defecto
-  event.target.onerror = null;  // Elimina el manejador de errores para evitar bucles infinitos
-  event.target.style.objectFit = 'contain';  // Ajusta la imagen para que se vea correctamente
+  event.target.src = placeholderImage;
+  event.target.onerror = null;
+  event.target.style.objectFit = 'contain';
 };
 
-// Se ejecuta cuando el componente se monta
+// Manejo de producto agregado
+const handleProductoAgregado = (producto) => {
+  console.log('Producto agregado:', producto);
+  showNotificationMessage(`${producto.nombre} añadido al carrito`);
+};
+
+// Manejo de errores del carrito
+const handleErrorCarrito = (error) => {
+  console.error('Error en carrito:', error);
+  showNotificationMessage(`Error al agregar producto: ${error.mensaje}`, true);
+};
+
+// Mostrar notificación
+const showNotificationMessage = (message, isError = false) => {
+  notificationMessage.value = message;
+  showNotification.value = true;
+  
+  // Estilo diferente para errores
+  if (isError) {
+    const notificationEl = document.querySelector('.productos-destacados .notification');
+    if (notificationEl) {
+      notificationEl.style.backgroundColor = '#ff6b6b';
+    }
+  }
+  
+  // Oculta la notificación después de 3 segundos
+  clearTimeout(notificationTimeout.value);
+  notificationTimeout.value = setTimeout(() => {
+    showNotification.value = false;
+  }, 3000);
+};
+
+// Limpiar timeout al desmontar
 onMounted(() => {
-  fetchProductos();  // Llama a la función para obtener los productos de Firebase
+  fetchProductos();
+});
+
+// Limpieza
+onUnmounted(() => {
+  clearTimeout(notificationTimeout.value);
 });
 </script>
+
 
 <style scoped>
 .productos-destacados {
@@ -223,4 +260,43 @@ h2 {
     max-width: 300px;
   }
 }
+
+/*Estilos para la notificacion de agregar al carro*/
+
+.productos-destacados {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  background-color: #333;
+  margin: 1rem 0;
+  padding: 2rem 0;
+  position: relative;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #5c36f2;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; top: 0; }
+  to { opacity: 1; top: 20px; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; top: 20px; }
+  to { opacity: 0; top: 0; }
+}
+
 </style>

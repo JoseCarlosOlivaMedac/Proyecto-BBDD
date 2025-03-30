@@ -1,6 +1,12 @@
 <template>
   <div class="wrapper">
-    <h1>Productos</h1>
+    <h1>PRODUCTOS</h1>
+    
+    <!-- Notificación de producto agregado -->
+    <div v-if="showNotification" class="notification">
+      {{ notificationMessage }}
+    </div>
+    
     <div class="productos-container">
       <div v-if="loading" class="loading-message">Cargando productos...</div>
       <div v-else-if="error" class="error-message">{{ error }}</div>
@@ -19,7 +25,12 @@
             <h2 class="producto-nombre">{{ producto.nombre }}</h2>
             <p class="producto-descripcion">{{ producto.descripcion }}</p>
             <p class="producto-precio">${{ formatPrice(producto.precio) }}</p>
-            <ButtonCarrito class="buttonCarrito"/>
+            <ButtonCarrito 
+              :productoId="producto.id" 
+              @producto-agregado="handleProductoAgregado"
+              @error-carrito="handleErrorCarrito"
+              class="buttonCarrito"
+            />
           </div>
         </div>
       </div>
@@ -28,108 +39,110 @@
 </template>
 
 <script>
-import { db } from '../firebase';  // Importa la instancia de Firebase Realtime Database configurada en el archivo firebase.js
-import { ref as dbRef, get } from "firebase/database";  // Importa las funciones necesarias para acceder a la base de datos de Firebase
-import ButtonCarrito from "../components/ButtonCarrito.vue";  // Importa el componente ButtonCarrito para ser utilizado en la vista
+import { db } from '../firebase';
+import { ref as dbRef, get } from "firebase/database";
+import ButtonCarrito from "../components/ButtonCarrito.vue";
 
 export default {
-  // Define los componentes que se van a usar en este componente Vue.
   components: {
-    ButtonCarrito  // Componente para el botón de agregar al carrito
+    ButtonCarrito
   },
   
-  // Define el nombre del componente.
   name: "Productos",
   
-  // Define el estado inicial del componente (data).
   data() {
     return {
-      productos: [],  // Arreglo donde se guardarán los productos obtenidos desde Firebase
-      loading: true,  // Estado que indica si los productos están siendo cargados
-      error: null,  // En caso de error, se almacenará el mensaje de error aquí
-      placeholderImage: '/imagenes/placeholder.jpg'  // Imagen de respaldo cuando no se puede cargar una imagen de producto
+      productos: [],
+      loading: true,
+      error: null,
+      placeholderImage: '/imagenes/placeholder.jpg',
+      showNotification: false,
+      notificationMessage: '',
+      notificationTimeout: null
     };
   },
   
-  // Define los métodos que se utilizarán dentro del componente.
   methods: {
-    
-    /**
-     * Función para obtener los productos desde Firebase Realtime Database.
-     * Realiza una consulta a la base de datos y asigna los resultados a la variable 'productos'.
-     * Muestra un mensaje de error en caso de que falle la consulta.
-     */
     async fetchProductos() {
       try {
-        this.loading = true;  // Marca el inicio de la carga
-        this.error = null;  // Resetea el error, por si hubo un intento previo que falló.
+        this.loading = true;
+        this.error = null;
 
-        // Realiza la consulta a la base de datos para obtener los productos.
         const snapshot = await get(dbRef(db, "productos"));
 
-        // Si la consulta devuelve resultados, los procesa.
         if (snapshot.exists()) {
-          // Convierte los productos obtenidos en un arreglo de objetos con sus respectivas propiedades.
           this.productos = Object.entries(snapshot.val()).map(([id, data]) => ({
             id,
-            ...data,  // Extiende los datos del producto con el ID
-            imagenUrl: this.getImageUrl(id)  // Asigna la URL de la imagen generada para el producto
+            ...data,
+            imagenUrl: this.getImageUrl(id)
           }));
         } else {
-          this.productos = [];  // Si no hay productos, se asigna un arreglo vacío
+          this.productos = [];
         }
       } catch (error) {
         console.error("Error al obtener productos:", error);
-        this.error = "Error al cargar los productos. Por favor, intente nuevamente.";  // Mensaje de error si algo falla
+        this.error = "Error al cargar los productos. Por favor, intente nuevamente.";
       } finally {
-        this.loading = false;  // Marca la carga como completada
+        this.loading = false;
       }
     },
     
-    /**
-     * Función para formatear el precio de los productos con el formato adecuado.
-     * @param {number} price - El precio del producto.
-     * @returns {string} - El precio formateado en formato moneda (España).
-     */
     formatPrice(price) {
       return Number(price).toLocaleString("es-ES");
     },
     
-    /**
-     * Maneja los errores de carga de imagen, mostrando una imagen por defecto en caso de error.
-     * @param {Event} event - El evento que se dispara cuando una imagen no puede cargarse.
-     */
     handleImageError(event) {
       console.log('Error cargando imagen', event.target.src);
-      event.target.src = this.placeholderImage;  // Asigna una imagen por defecto
-      event.target.onerror = null;  // Elimina el manejador de errores para evitar bucles infinitos
-      event.target.style.objectFit = 'contain';  // Cambia el ajuste de la imagen para que se vea bien
+      event.target.src = this.placeholderImage;
+      event.target.onerror = null;
+      event.target.style.objectFit = 'contain';
     },
 
-    /**
-     * Función para generar la URL de la imagen de cada producto, basándose en su ID.
-     * La URL de la imagen se construye usando el ID del producto.
-     * @param {string} productId - El ID del producto (ej. "producto1").
-     * @returns {string} - La URL de la imagen correspondiente al producto.
-     */
     getImageUrl(productId) {
-      // Extrae el número del ID (ej: "producto1" -> 1)
-      const num = parseInt(productId.replace(/\D/g, '')) || 1;  // Extrae el número y lo convierte a entero.
+      const num = parseInt(productId.replace(/\D/g, '')) || 1;
+      return `/imagenes/producto(${Math.min(num, 20)}).jpg`;
+    },
+    
+    handleProductoAgregado(producto) {
+      console.log('Producto agregado:', producto);
+      this.showNotificationMessage(`${producto.nombre} añadido al carrito`);
+    },
+    
+    handleErrorCarrito(error) {
+      console.error('Error en carrito:', error);
+      this.showNotificationMessage(`Error al agregar producto: ${error.mensaje}`, true);
+    },
+    
+    showNotificationMessage(message, isError = false) {
+      this.notificationMessage = message;
+      this.showNotification = true;
       
-      // Devuelve la URL de la imagen, asegurándose de que el número del producto no sea mayor a 20.
-      return `/imagenes/producto(${Math.min(num, 20)}).jpg`;  
+      // Estilo diferente para errores
+      if (isError) {
+        const notificationEl = document.querySelector('.notification');
+        if (notificationEl) {
+          notificationEl.style.backgroundColor = '#ff6b6b';
+        }
+      }
+      
+      // Oculta la notificación después de 3 segundos
+      clearTimeout(this.notificationTimeout);
+      this.notificationTimeout = setTimeout(() => {
+        this.showNotification = false;
+      }, 3000);
     }
   },
 
-  /**
-   * Hook de ciclo de vida de Vue que se ejecuta cuando el componente ha sido montado.
-   * Aquí se llama a la función para obtener los productos desde la base de datos de Firebase.
-   */
   async mounted() {
-    await this.fetchProductos();  // Llama a la función para obtener los productos al montar el componente.
+    await this.fetchProductos();
+  },
+  
+  beforeUnmount() {
+    clearTimeout(this.notificationTimeout);
   }
 };
 </script>
+
 
 <style scoped>
 
@@ -230,5 +243,33 @@ h1{
   margin-top: 1rem;
   display: flex;
   justify-content: center;
+}
+
+
+/*Estilos para la ventana emergente al agregar al carro */
+
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #5c36f2;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; top: 0; }
+  to { opacity: 1; top: 20px; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; top: 20px; }
+  to { opacity: 0; top: 0; }
 }
 </style>

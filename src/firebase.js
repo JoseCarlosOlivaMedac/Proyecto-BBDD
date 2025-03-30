@@ -1,5 +1,6 @@
 import { initializeApp, getApp } from "firebase/app";  // Importa las funciones necesarias para inicializar y obtener la app de Firebase
 import { getDatabase } from "firebase/database";  // Importa la función para obtener la referencia a la base de datos en tiempo real de Firebase
+import { getAuth } from "firebase/auth";  // Importa la función para obtener la referencia a la autenticación de Firebase
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -25,5 +26,8 @@ try {
 // Obtiene el servicio de la base de datos en tiempo real de Firebase usando la instancia de la app
 const db = getDatabase(firebaseApp);
 
-// Exporta la referencia a la base de datos para que otros módulos puedan utilizarla
-export { db };
+// Inicializa el servicio de autenticación de Firebase
+const auth = getAuth(firebaseApp);
+
+// Exporta la referencia a la base de datos y la autenticación para que otros módulos puedan utilizarlas
+export { db, auth };

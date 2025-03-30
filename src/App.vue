@@ -3,7 +3,6 @@
     <Header />
     <router-view /> <!-- Aquí se cargarán las vistas dinámicas -->
     
-    
     <Footer />
   </template>
   
@@ -13,6 +12,12 @@
   </script>
   
   <style scoped>
+  :root {
+  --color-primary: #5c36f2;
+  --color-secondary: #e67d00;
+  --color-background: #f4f7f6;
+  --color-text: #333;
+}
   * {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 16px;

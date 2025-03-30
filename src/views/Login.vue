@@ -38,6 +38,8 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { auth } from "../firebase"; // Importa el servicio de autenticación
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth"; // Importa las funciones necesarias
 
 const email = ref("");
 const password = ref("");
@@ -49,11 +51,24 @@ const cerrarVista = () => {
   router.push("/");
 };
 
-const submitForm = () => {
-  if (isLogin.value) {
-    console.log("Iniciando sesión con:", email.value, password.value);
-  } else {
-    console.log("Registrando usuario:", name.value, email.value, password.value);
+const submitForm = async () => {
+  try {
+    if (isLogin.value) {
+      // Iniciar sesión
+      const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+      console.log("Usuario autenticado:", userCredential.user);
+      alert("Inicio de sesión exitoso");
+      router.push("/"); // Redirige al usuario a la página principal
+    } else {
+      // Registrar usuario
+      const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
+      console.log("Usuario registrado:", userCredential.user);
+      alert("Registro exitoso");
+      router.push("/"); // Redirige al usuario a la página principal
+    }
+  } catch (error) {
+    console.error("Error en la autenticación:", error);
+    alert("Error: " + error.message); // Muestra el mensaje de error al usuario
   }
 };
 
