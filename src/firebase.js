@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
 // Configuración de Firebase
@@ -11,11 +11,19 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Inicialización de Firebase
-const firebaseApp = initializeApp(firebaseConfig);
 
+// Intentar obtener la instancia de la app
+let firebaseApp;
+
+try {
+  // Si ya existe una app inicializada, obtenla
+  firebaseApp = getApp();
+} catch (error) {
+  // Si no existe, inicialízala
+  firebaseApp = initializeApp(firebaseConfig);
+}
 // Servicio de Firebase Realtime Database
 const db = getDatabase(firebaseApp);
 
 // Exportaciones
-export { db };  // Eliminamos la exportación de `storage` ya que ya no se usa
+export { db };

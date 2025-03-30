@@ -3,12 +3,13 @@
     <h1>Productos</h1>
     <div class="productos-container">
       <div v-if="loading" class="loading-message">Cargando productos...</div>
+      <div v-else-if="error" class="error-message">{{ error }}</div>
       <div v-else-if="productos.length === 0" class="empty-message">No hay productos disponibles</div>
       <div v-else class="productos-grid">
         <div v-for="producto in productos" :key="producto.id" class="producto">
           <div class="producto-imagen-container">
             <img 
-              :src="getImageUrl(producto.id)" 
+              :src="producto.imagenUrl || placeholderImage" 
               :alt="'Imagen de ' + producto.nombre"
               class="producto-imagen"
               @error="handleImageError"
@@ -18,6 +19,7 @@
             <h2 class="producto-nombre">{{ producto.nombre }}</h2>
             <p class="producto-descripcion">{{ producto.descripcion }}</p>
             <p class="producto-precio">${{ formatPrice(producto.precio) }}</p>
+            <ButtonCarrito class="buttonCarrito"/>
           </div>
         </div>
       </div>
@@ -26,32 +28,22 @@
 </template>
 
 <script>
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref as dbRef, get } from "firebase/database";
-
-const firebaseConfig = {
-  databaseURL: "https://bd-bbdd-default-rtdb.europe-west1.firebasedatabase.app/"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+import { db } from '../firebase'; // Importamos desde el archivo centralizado
+import { ref as dbRef, get } from "firebase/database";
+import ButtonCarrito from "../components/ButtonCarrito.vue";
 
 export default {
+  components: {
+    ButtonCarrito
+  },
+  
   name: "Productos",
   data() {
     return {
       productos: [],
       loading: true,
       error: null,
-      // Mapeo de IDs de producto a nombres de imagen
-      imageMap: (() => {
-        const map = {};
-        // Generamos el mapeo automático para los productos, ajustando a las claves de producto (producto1, producto2...)
-        for (let i = 1; i <= 20; i++) {
-          map[`producto${i}`] = `producto (${i}).jpg`;
-        }
-        return map;
-      })()
+      placeholderImage: '/imagenes/placeholder.jpg'
     };
   },
   methods: {
@@ -62,13 +54,19 @@ export default {
 
         const snapshot = await get(dbRef(db, "productos"));
 
-        this.productos = snapshot.exists() 
-          ? Object.entries(snapshot.val()).map(([id, data]) => ({ id, ...data }))
-          : [];
-          
+        if (snapshot.exists()) {
+          this.productos = Object.entries(snapshot.val()).map(([id, data]) => ({
+            id,
+            ...data,
+            // Usamos getImageUrl para generar la URL de la imagen
+            imagenUrl: this.getImageUrl(id)
+          }));
+        } else {
+          this.productos = [];
+        }
       } catch (error) {
         console.error("Error al obtener productos:", error);
-        this.error = "Error al cargar los productos";
+        this.error = "Error al cargar los productos. Por favor, intente nuevamente.";
       } finally {
         this.loading = false;
       }
@@ -76,18 +74,17 @@ export default {
     formatPrice(price) {
       return Number(price).toLocaleString("es-ES");
     },
-    getImageUrl(productId) {
-      const imageName = this.imageMap[productId];
-      console.log(`ID: ${productId}, Imagen: ${imageName}`); // Debugging
-      // Asegúrate de usar la ruta correcta para acceder a la carpeta 'public'
-      return imageName ? `/imagenes/${imageName}` : '/imagenes/placeholder.jpg';
-    },
     handleImageError(event) {
-      console.log('Error cargando imagen', event.target.src); // Debugging
-      event.target.src = '/imagenes/placeholder.jpg';
+      console.log('Error cargando imagen', event.target.src);
+      event.target.src = this.placeholderImage;
       event.target.onerror = null;
       event.target.style.objectFit = 'contain';
-    }
+    },
+    getImageUrl(productId) {
+  // Extrae el número del ID (ej: "producto1" -> 1)
+  const num = parseInt(productId.replace(/\D/g, '')) || 1;  // Asegura que siempre se extrae un número
+  return `/imagenes/producto(${Math.min(num, 20)}).jpg`;  // Usa la URL correcta con el número en el paréntesis
+}
   },
   async mounted() {
     await this.fetchProductos();
@@ -95,8 +92,14 @@ export default {
 };
 </script>
 
-
 <style scoped>
+
+h1{ 
+  text-align: center;
+  margin: 2rem 0;
+  font-size: 2.5rem;
+  color: #333;
+}
 .wrapper {
   padding: 2rem;
   background-color: #f8f9fa;
@@ -131,10 +134,6 @@ export default {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.producto:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
 
 .producto-imagen-container {
   height: 200px;
@@ -150,9 +149,6 @@ export default {
   transition: transform 0.3s ease;
 }
 
-.producto:hover .producto-imagen {
-  transform: scale(1.05);
-}
 
 .producto-info {
   padding: 1.2rem;
@@ -189,5 +185,11 @@ export default {
   .wrapper {
     padding: 1rem;
   }
+}
+
+.buttonCarrito{
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
 }
 </style>
