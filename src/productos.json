@@ -3,120 +3,120 @@
     "nombre": "Camiseta Negra Clásica",
     "precio": 19.99,
     "descripcion": "Camiseta de algodón negra con un diseño minimalista.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(1).jpg?alt=media"
   },
   "producto2": {
     "nombre": "Camiseta Blanca Casual",
     "precio": 18.50,
     "descripcion": "Perfecta para cualquier ocasión, hecha 100% de algodón.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(2).jpg?alt=media"
   },
   "producto3": {
     "nombre": "Camiseta Vintage 90s",
     "precio": 22.99,
     "descripcion": "Diseño inspirado en los años 90, con un toque retro.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(3).jpg?alt=media"
   },
   "producto4": {
     "nombre": "Camiseta Oversize Streetwear",
     "precio": 24.99,
     "descripcion": "Estilo urbano y relajado, ideal para el día a día.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(4).jpg?alt=media"
   },
   "producto5": {
     "nombre": "Camiseta Estampada Skate",
     "precio": 21.99,
     "descripcion": "Diseño llamativo para los amantes del skateboarding.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(5).jpg?alt=media"
   },
   "producto6": {
     "nombre": "Camiseta Tie Dye Psicodélica",
     "precio": 26.50,
     "descripcion": "Diseño colorido y único hecho con técnica tie dye.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(6).jpg?alt=media"
   },
   "producto7": {
     "nombre": "Camiseta Básica Beige",
     "precio": 17.99,
     "descripcion": "Minimalista y combinable con cualquier outfit.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(7).jpg?alt=media"
   },
   "producto8": {
     "nombre": "Camiseta Anime Japón",
     "precio": 27.50,
     "descripcion": "Para los fanáticos del anime, con ilustraciones japonesas.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(8).jpg?alt=media"
   },
   "producto9": {
     "nombre": "Camiseta Techwear Negra",
     "precio": 32.99,
     "descripcion": "Diseño futurista y moderno, ideal para un look techwear.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(9).jpg?alt=media"
   },
   "producto10": {
     "nombre": "Camiseta Rock Band",
     "precio": 29.99,
     "descripcion": "Con estampados de bandas icónicas del rock.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(10).jpg?alt=media"
   },
   "producto11": {
     "nombre": "Camiseta Coder Dev",
     "precio": 19.99,
     "descripcion": "Para los programadores, con frases geek sobre código.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(11).jpg?alt=media"
   },
   "producto12": {
     "nombre": "Camiseta Graffiti Art",
     "precio": 22.99,
     "descripcion": "Inspirada en el arte urbano y los grafitis.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(12).jpg?alt=media"
   },
   "producto13": {
     "nombre": "Camiseta Fitness Gym",
     "precio": 25.99,
     "descripcion": "Material transpirable para entrenamientos intensos.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(13).jpg?alt=media"
   },
   "producto14": {
     "nombre": "Camiseta Gamer RGB",
     "precio": 23.99,
     "descripcion": "Para los amantes de los videojuegos, con diseños RGB.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(14).jpg?alt=media"
   },
   "producto15": {
     "nombre": "Camiseta Frases Motivadoras",
     "precio": 20.50,
     "descripcion": "Mensajes inspiradores para empezar el día con energía.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(15).jpg?alt=media"
   },
   "producto16": {
     "nombre": "Camiseta Camuflaje Militar",
     "precio": 26.99,
     "descripcion": "Estilo camuflado para un look rudo y aventurero.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(16).jpg?alt=media"
   },
   "producto17": {
     "nombre": "Camiseta Cyberpunk Neon",
     "precio": 31.99,
     "descripcion": "Inspirada en el estilo cyberpunk y la ciencia ficción.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(17).jpg?alt=media"
   },
   "producto18": {
     "nombre": "Camiseta Minimalista Sin Logo",
     "precio": 16.99,
     "descripcion": "Simple y sin marcas, ideal para un look discreto.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(18).jpg?alt=media"
   },
   "producto19": {
     "nombre": "Camiseta Personalizada con Texto",
     "precio": 28.99,
     "descripcion": "Personalízala con tu propio mensaje o diseño.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(19).jpg?alt=media"
   },
   "producto20": {
     "nombre": "Camiseta Edición Limitada",
     "precio": 35.99,
     "descripcion": "Diseño exclusivo con unidades limitadas.",
-    "imagen": "https://via.placeholder.com/150"
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/tu-proyecto.appspot.com/o/productos%2Fcamiseta%20(20).jpg?alt=media"
   }
 }
