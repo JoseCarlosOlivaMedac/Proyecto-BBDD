@@ -45,7 +45,7 @@ footer ul {
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-    flex-wrap: wrap; /* Permite que los elementos se ajusten en móviles */
+    flex-wrap: wrap; 
 }
 
 footer ul li {
@@ -62,7 +62,7 @@ footer ul li a {
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* Espacio entre icono y texto */
+    gap: 0.5rem; 
     transition: color 0.3s ease;
 }
 
@@ -70,7 +70,7 @@ footer ul li a:hover {
     color: var(--color-primario-hover);
 }
 
-/* Texto adicional del footer */
+
 footer p {
     margin-top: 1rem;
     font-size: 0.9rem;
@@ -82,7 +82,7 @@ footer p {
   font-size: 16px;
   font-weight: bold;
   color: white;
-  background: linear-gradient(135deg, #4a90e2, #1c3faa);
+  background: linear-gradient(135deg, #7659e9, #5c36f2);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -91,7 +91,6 @@ footer p {
 }
 
 
-/* Responsivo */
 @media (max-width: 600px) {
     footer ul {
         flex-direction: column;
