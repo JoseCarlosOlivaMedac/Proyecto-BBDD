@@ -1,25 +1,24 @@
 // src/firebase.js
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getDatabase, ref, set } from "firebase/database";
+import { initializeApp,getApps, getApp } from "firebase/app";
+import { getAuth} from "firebase/auth";
+import { getFirestore} from "firebase/firestore";
+import { getDatabase} from "firebase/database";
 import { getAnalytics } from "firebase/analytics"; 
-import { getAuth } from "firebase/auth";
-const apiKey = import.meta.env.VITE_API_KEY
+
 
 // Configuración de Firebase 
 const firebaseConfig = {
-  apiKey: "VITE_API_KEY",
-  authDomain: "medac-proyectobbdd.firebaseapp.com",
-  projectId: "medac-proyectobbdd",
-  storageBucket: "medac-proyectobbdd.firebasestorage.app",
-  messagingSenderId: "512777032126",
-  appId: "1:512777032126:web:1d37292c815db8ef99a9ef",
-  measurementId: "G-1J8TPMP0QN"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Inicializa Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 // Inicializa Firestore (base de datos)
 const db = getFirestore(app);
@@ -37,5 +36,5 @@ export { db };
 export { database };
 
 // Exporta la referencia a Auth para usarla en componentes
-export { auth };
+export { auth};
 

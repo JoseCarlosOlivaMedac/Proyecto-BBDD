@@ -37,23 +37,9 @@
   
   // Lista de productos en el carrito
   
-  const carrito = ref([     //Estos 2 productos estan cargados estaticamente para poder estilizarlos
-                            //Queda pendiente levantar la funcionalidad para cargar productos dinamicamente desde "Productos.vue"
-     {
-      nombre: "Producto 1",
-      descripcion: "Descripción del producto 1",
-      precio: 20.0,
-      cantidad: 1,
-      imagen: "/imagenes/producto1.jpg",
-    },
-    {
-      nombre: "Producto 2",
-      descripcion: "Descripción del producto 2",
-      precio: 25.0,
-      cantidad: 2,
-      imagen: "/imagenes/producto2.jpg",
-    },
-  ]);
+  const carrito = ref([     
+                            
+       ]);
   
   // Calcular el total del carrito
   const calcularTotal = () => {

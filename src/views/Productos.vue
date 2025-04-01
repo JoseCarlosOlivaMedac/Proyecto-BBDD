@@ -2,6 +2,7 @@
     <section class="productos" v-if="isVisible">
       <button class="btn-close" @click="closeView">✖</button>
       <h2>PRODUCTOS</h2>
+      
       <div v-if="error" class="error-message">{{ error }}</div>
       <div v-else class="productos-grid">
         <div v-for="(producto, index) in productos" :key="producto.id" class="producto">
@@ -12,19 +13,14 @@
           <button class="btn-secundary" @click="agregarAlCarrito(producto)">
             Agregar al Carrito
           </button>
-          <button class="btn-edit" @click="actualizarProducto(producto.id, { precio: producto.precio + 5 })">
-            Subir Precio
-          </button>
-          <button class="btn-delete" @click="eliminarProducto(producto.id)">
-            Eliminar
-          </button>
         </div>
       </div>
-    </section>
+      </section>
   </template>
   
   <script setup>
   import { ref, onMounted } from "vue";
+  import { inject } from "vue";
   import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
   import { db } from "../firebase";
   
@@ -70,6 +66,11 @@
   const closeView = () => {
     isVisible.value = false;
   };
+
+  // Función para agregar al carrito 
+  const agregarAlCarrito = (producto) => {
+  console.log("Producto agregado:", producto);
+};
   </script>
   <style scoped>
   .productos {

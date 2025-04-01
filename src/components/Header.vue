@@ -13,10 +13,17 @@
     </button>
     <nav :class="{ 'nav-menu': true, 'show': isMenuOpen }">
       <ul>
+        <div class="user-info">
+          <p v-if="userName">Bienvenid@, <strong>{{ userName }}</strong></p>
+          <button v-if="userName" @click="logout">Cerrar Sesión</button>
+        </div>
+        <div>
+          <SearchBar /> 
+        </div>
         <li><i class="fas fa-home"></i> <router-link to="/">Inicio</router-link></li>
         <li><i class="fas fa-shopping-bag"></i> <router-link to="/productos">Productos</router-link></li>
         <li><i class="fas fa-shopping-cart"></i> <router-link to="/carrito">Carrito</router-link></li>
-        <li><i class="fas fa-user"></i> <router-link to="/login">Login</router-link></li>
+        <li v-if="!userName"><i class="fas fa-user"></i> <router-link to="/login">Login</router-link></li>
       </ul>
     </nav>
   </header>
@@ -24,23 +31,43 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import SearchBar from "./BarraBusqueda.vue";
 
-// Estado del menú
+// Estado del menú de navegación
 const isMenuOpen = ref(false);
 
-// Alternar menú
+// Función para alternar el menú
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
 
-// Agregar animación al logo al cargar
+const userName = ref(""); // Almacena el nombre del usuario
+const auth = getAuth();
+const router = useRouter();
+
+// Verificar el estado de autenticación
 onMounted(() => {
-  const logo = document.querySelector(".logo h1");
-  logo.classList.add("animate-logo");
-  setTimeout(() => {
-    logo.classList.remove("animate-logo");
-  }, 1500);
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      userName.value = user.displayName || "Usuario"; // Asigna el nombre del usuario
+    } else {
+      userName.value = ""; // Usuario no autenticado
+    }
+  });
 });
+
+// Función para cerrar sesión
+const logout = async () => {
+  try {
+    await signOut(auth); // Cierra sesión en Firebase
+    userName.value = ""; // Limpia el nombre del usuario
+    router.push("/"); // Redirige al inicio
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+  }
+};
 </script>
 
 <style scoped>
@@ -65,6 +92,40 @@ header {
   gap: 0.5rem;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
+}
+
+  /* Ventana usuario registrado */
+  .navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #5c36f2;
+  padding: 10px 20px;
+  color: white;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: 0; /* Elimina el margen automático */
+  margin-right: auto;
+}
+
+.user-info p {
+  font-size: 0.8rem; /* Mismo tamaño que el header */
+  font-weight: bold; /* Misma negrita */
+  color: white; /* Asegura que el color sea el mismo */
+}
+
+button {
+  background: #5c36f2;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+button:hover {
+  background: #e67d00;
 }
 
 /* Animación inicial */

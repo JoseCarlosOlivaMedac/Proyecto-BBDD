@@ -5,18 +5,18 @@
         <h2>{{ isLogin ? "Iniciar Sesión" : "Registro" }}</h2>
         <button class="close-btn" @click="cerrarVista">✖</button>
       </div>
-      
+
       <form @submit.prevent="submitForm">
         <div class="input-group">
           <label for="email">Correo electrónico</label>
           <input type="email" id="email" v-model="email" required placeholder="Ingresa tu correo">
         </div>
-        
+
         <div class="input-group">
           <label for="password">Contraseña</label>
           <input type="password" id="password" v-model="password" required placeholder="Ingresa tu contraseña">
         </div>
-        
+
         <div v-if="!isLogin" class="input-group">
           <label for="name">Nombre Completo</label>
           <input type="text" id="name" v-model="name" required placeholder="Ingresa tu nombre">
@@ -32,35 +32,92 @@
         <span @click="toggleAuthMode">{{ isLogin ? "Regístrate aquí" : "Inicia sesión aquí" }}</span>
       </p>
     </div>
+
+    <!-- Modal de Bienvenida -->
+    <div v-if="showWelcomeModal" class="modal-overlay">
+      <div class="modal">
+        <h2>¡Registro Exitoso!</h2>
+        <p>Bienvenid@, {{ userName }}. Tu cuenta ha sido creada correctamente.</p>
+        <button @click="closeModal" class="btn-close">Ir a Inicio</button>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "../firebase"; 
 import { useRouter } from "vue-router";
 
+const auth = getAuth(); 
+
+// Definir propiedades reactivas
 const email = ref("");
 const password = ref("");
 const name = ref("");
-const isLogin = ref(true); // Alternar entre Login y Registro
+const userName = ref("Usuario");
+const isLogin = ref(true);  // 🔥 Añadido para evitar los errores
+const showWelcomeModal = ref(false);
+const errorMessage = ref("");
 const router = useRouter();
 
-const cerrarVista = () => {
-  router.push("/");
-};
-
-const submitForm = () => {
-  if (isLogin.value) {
-    console.log("Iniciando sesión con:", email.value, password.value);
-  } else {
-    console.log("Registrando usuario:", name.value, email.value, password.value);
-  }
-};
-
+// Alternar entre Login y Registro
 const toggleAuthMode = () => {
   isLogin.value = !isLogin.value;
 };
+
+// Función para cerrar el modal y redirigir a la página de inicio
+const closeModal = () => {
+  showWelcomeModal.value = false; // Oculta el modal
+  router.push("/"); // Redirige al inicio
+};
+
+// Función para registrar usuarios
+const register = async () => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
+    const user = userCredential.user;
+
+    // Actualizar perfil con el nombre
+    await updateProfile(user, { displayName: name.value });
+
+    // Esperamos que la actualización del perfil se refleje
+    await user.reload(); 
+
+    const updatedUser = getAuth().currentUser;
+    userName.value = updatedUser?.displayName || "Usuario";
+
+    console.log("Usuario registrado:", updatedUser);
+    console.log("Nombre registrado:", userName.value);
+
+    // Guardar usuario en Firestore
+    await setDoc(doc(db, "users", updatedUser.uid), {
+      name: name.value,
+      email: email.value,
+      uid: updatedUser.uid
+    });
+
+    // Mostrar modal de bienvenida
+    showWelcomeModal.value = true;
+  } catch (error) {
+    errorMessage.value = error.message;
+    console.error("Error en el registro:", error);
+  }
+};
+
+// Manejo de formulario (login o registro)
+const submitForm = async () => {
+  if (isLogin.value) {
+    console.log("Lógica de inicio de sesión aquí...");
+  } else {
+    await register();
+  }
+};
+
 </script>
+
 
 <style scoped>
 
@@ -179,5 +236,53 @@ p span:hover {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+/* Estilos de la ventana modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 350px;
+}
+
+.modal h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.modal p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-close {
+  background: #5c36f2;
+  color: white;
+  padding: 0.8rem;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-close:hover {
+  background: #e67d00;
 }
 </style>
