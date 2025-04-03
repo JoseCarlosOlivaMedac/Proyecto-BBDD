@@ -1,6 +1,6 @@
 <template>
 
-    <Header />
+    <Header/>
     <router-view /> <!-- Aquí se cargarán las vistas dinámicas -->
     <Footer />
   </template>
@@ -8,9 +8,10 @@
   <script setup>
   import Header from './components/Header.vue';
   import Footer from './components/Footer.vue';
-  import { ref, onMounted, provide } from "vue";
-  import { auth } from "./firebase";
+  import { ref, onMounted, provide} from "vue";
+  import { auth } from "./firebase.js";
   import { onAuthStateChanged, signOut } from "firebase/auth"; // Importar el componente de búsqueda
+
 
   const carrito = ref([]);
 

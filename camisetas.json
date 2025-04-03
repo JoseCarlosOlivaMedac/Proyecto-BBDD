@@ -1,0 +1,56 @@
+[
+  {
+    "id": "7qURuPyv7gaCt2gmRG6f",
+    "categoria": "camiseta",
+    "nombre": "Lacoste",
+    "precio": 41.95,
+    "stock": 40,
+    "descripcion": "camiseta basica - white",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/79a5e9e054894b3ca28a7a6b9e5e1ed7/32a86fbdcf2e414c8dcb35580fb438ad.jpg?imwidth=1800&filter=packshot.net/article/spp-media-p1/79a5e9e054894b3ca28a7a6b9e5e1ed7/32a86fbdcf2e414c\"h8dcb35580fb438ad.jpg?imwidth=1800&filter=packshot"
+  },
+  {
+    "id": "DtFmWK4B4TTxZ7cht3YT",
+    "categoria": "camiseta",
+    "nombre": "Levi's",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/2188fc9e749c49acb34b9ca228e9b5c3/170e03c25ad94d5b969741ce0aef335c.jpg?imwidth=1800&filter=packshot",
+    "precio": 19.95,
+    "stock": 28,
+    "descripcion": "camiseta estampada - dress blues"
+  },
+  {
+    "id": "FIRR0eKtjyAyVpimWah6",
+    "categoria": "camiseta",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/dd1d9998c2f849d9a64e5764b1fe3776/66978c2c870b44c5b90b311bbab265d9.jpg?imwidth=1800&filter=packshot",
+    "nombre": "adidas Originals",
+    "descripcion": "stripes tee - Camiseta estampada - collegiate green",
+    "precio": 21.55,
+    "stock": 34
+  },
+  {
+    "id": "Jcbkwx5D2ekjoRVgB6vB",
+    "categoria": "camiseta",
+    "descripcion": "camiseta basica",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/ce7a376fdcb34128b1de816eca1f4cb9/bf487940e1214cd3be485312ed033a39.jpg?imwidth=1800&filter=packshot",
+    "nombre": "jordan",
+    "precio": 33.85,
+    "stock": 18
+  },
+  {
+    "id": "JlsADTQcgcQwkMR6bAiC",
+    "categoria": "camiseta",
+    "descripcion": "camiseta estampada - anthracite",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/82f23b9721f642c880cf7d392df9d5c9/94e1d0590e104a25ac089525169330ee.jpg?imwidth=1800&filter=packshot",
+    "nombre": "scalpers",
+    "precio": 29.9,
+    "stock": 2
+  },
+  {
+    "id": "i6J70nJmRpUkRLmD2UTK",
+    "categoria": "camiseta",
+    "descripcion": "dero - Camiseta basica - schwarz",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/9501c7e673fe42efa85f4cfb041d0033/228766e96ed2401ca498af31ca1c076d.jpg?imwidth=762&filter=packshot",
+    "nombre": "hugo",
+    "precio": 39.95,
+    "stock": 10
+  }
+]

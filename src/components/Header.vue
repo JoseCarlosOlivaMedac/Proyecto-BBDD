@@ -35,6 +35,7 @@ import { useRouter } from "vue-router";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import SearchBar from "./BarraBusqueda.vue";
 
+
 // Estado del menú de navegación
 const isMenuOpen = ref(false);
 

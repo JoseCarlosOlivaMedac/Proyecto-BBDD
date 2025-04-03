@@ -11,9 +11,9 @@
         <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14A4.5 4.5 0 119.5 5a4.5 4.5 0 010 9z"/>
       </svg>
     </div>
-    <ul v-if="results.length" class="results">
-      <li v-for="result in results" :key="result.id">
-        {{ result.name }}
+    <ul v-if="results.length > 0" class="results">
+      <li v-for="(producto, index) in results" :key="index">
+        {{ producto.name }}
       </li>
     </ul>
   </div>
@@ -27,21 +27,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 const queryText = ref('');
 const results = ref([]);
 
-/*
-// Test conexion buscador a firebase
-const testFirebase = async () => {
-  try {
-    const q = collection(db, 'camisetas'); // Obtener todos los productos
-    const querySnapshot = await getDocs(q);
-    console.log("Productos en Firestore:", querySnapshot.docs.map(doc => doc.data()));
-  } catch (error) {
-    console.error("Error al conectar con Firestore:", error);
-  }
-};
 
-testFirebase();
-
-*/
 const onSearch = async () => {
     console.log("onSearch ejecutado con:", queryText.value);
   if (queryText.value.length < 2) {
@@ -108,6 +94,10 @@ const onSearch = async () => {
   margin-top: 8px;
   list-style: none;
   padding: 0;
+   /* Asegura que la lista no se corte */
+   max-height: 200px; /* Ajusta según necesites */
+  overflow-y: auto;
+  z-index: 1000; /* Asegura que aparezca por encima de otros elementos */
 }
 .results li {
   padding: 12px;

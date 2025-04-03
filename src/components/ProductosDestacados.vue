@@ -20,30 +20,42 @@
   import { ref } from 'vue';
   
   const productos = ref([
-    {
-      nombre: "Producto 1",
-      descripcion: "Descripción del producto 1",
-      precio: 20.00,
-      imagen: "/public/imagenes/producto1.jpg"
-    },
-    {
-      nombre: "Producto 2",
-      descripcion: "Descripción del producto 2",
-      precio: 25.00,
-      imagen: "/public/imagenes/producto2.jpg"
-    },
-    {
-      nombre: "Producto 3",
-      descripcion: "Descripción del producto 3",
-      precio: 30.00,
-      imagen: "/public/imagenes/producto3.jpg"
-    },
-    {
-      nombre: "Producto 4",
-      descripcion: "Descripción del producto 4",
-      precio: 18.00,
-      imagen: "/public/imagenes/producto4.jpg"
-    }
+  {
+    "id": "7qURuPyv7gaCt2gmRG6f",
+    "categoria": "camiseta",
+    "nombre": "Lacoste",
+    "precio": 41.95,
+    "stock": 40,
+    "descripcion": "camiseta basica - white",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/79a5e9e054894b3ca28a7a6b9e5e1ed7/32a86fbdcf2e414c8dcb35580fb438ad.jpg?imwidth=1800&filter=packshot.net/article/spp-media-p1/79a5e9e054894b3ca28a7a6b9e5e1ed7/32a86fbdcf2e414c\"h8dcb35580fb438ad.jpg?imwidth=1800&filter=packshot"
+  },
+  {
+    "id": "DtFmWK4B4TTxZ7cht3YT",
+    "categoria": "camiseta",
+    "nombre": "Levi's",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/2188fc9e749c49acb34b9ca228e9b5c3/170e03c25ad94d5b969741ce0aef335c.jpg?imwidth=1800&filter=packshot",
+    "precio": 19.95,
+    "stock": 28,
+    "descripcion": "camiseta estampada - dress blues"
+  },
+  {
+    "id": "Jcbkwx5D2ekjoRVgB6vB",
+    "categoria": "camiseta",
+    "descripcion": "camiseta basica",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/ce7a376fdcb34128b1de816eca1f4cb9/bf487940e1214cd3be485312ed033a39.jpg?imwidth=1800&filter=packshot",
+    "nombre": "jordan",
+    "precio": 33.85,
+    "stock": 18
+  },
+  {
+    "id": "JlsADTQcgcQwkMR6bAiC",
+    "categoria": "camiseta",
+    "descripcion": "camiseta estampada - anthracite",
+    "imagen": "https://img01.ztat.net/article/spp-media-p1/82f23b9721f642c880cf7d392df9d5c9/94e1d0590e104a25ac089525169330ee.jpg?imwidth=1800&filter=packshot",
+    "nombre": "scalpers",
+    "precio": 29.9,
+    "stock": 2
+  },
   ]);
   </script>
   
