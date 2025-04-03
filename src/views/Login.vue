@@ -27,10 +27,13 @@
         </button>
       </form>
 
-      <p>
-        {{ isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?" }}
-        <span @click="toggleAuthMode">{{ isLogin ? "Regístrate aquí" : "Inicia sesión aquí" }}</span>
-      </p>
+          <!-- Mensaje de error -->
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+    <p>
+      {{ isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?" }}
+      <span @click="toggleAuthMode">{{ isLogin ? "Regístrate aquí" : "Inicia sesión aquí" }}</span>
+    </p>
     </div>
 
     <!-- Modal de Bienvenida -->
@@ -46,7 +49,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "../firebase"; 
 import { useRouter } from "vue-router";
@@ -72,6 +75,20 @@ const toggleAuthMode = () => {
 const closeModal = () => {
   showWelcomeModal.value = false; // Oculta el modal
   router.push("/"); // Redirige al inicio
+};
+
+// Función para Logeo
+const login = async () => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+    console.log("✅ Usuario autenticado:", userCredential.user);
+    router.push("/"); // Redirige a la página principal
+    // Mostrar el modal de bienvenida
+    showWelcomeModal.value = true;
+  } catch (error) {
+    console.error("❌ Error en el inicio de sesión:", error.message);
+    errorMessage.value = "Correo o contraseña incorrectos";
+  }
 };
 
 // Función para registrar usuarios
@@ -110,11 +127,12 @@ const register = async () => {
 // Manejo de formulario (login o registro)
 const submitForm = async () => {
   if (isLogin.value) {
-    console.log("Lógica de inicio de sesión aquí...");
+    await login();  
   } else {
     await register();
   }
 };
+
 
 </script>
 

@@ -3,7 +3,6 @@ import { initializeApp,getApps, getApp } from "firebase/app";
 import { getAuth} from "firebase/auth";
 import { getFirestore} from "firebase/firestore";
 import { getDatabase} from "firebase/database";
-import { getAnalytics } from "firebase/analytics"; 
 
 
 // Configuración de Firebase 
