@@ -13,16 +13,17 @@
     </button>
     <nav :class="{ 'nav-menu': true, 'show': isMenuOpen }">
       <ul>
-        <div class="user-info">
-          <p v-if="userName">Bienvenid@, <strong>{{ userName }}</strong></p>
-          <button v-if="userName" @click="logout">Cerrar Sesión</button>
-        </div>
+        
         <div>
           <SearchBar /> 
         </div>
         <li><i class="fas fa-home"></i> <router-link to="/">Inicio</router-link></li>
         <li><i class="fas fa-shopping-bag"></i> <router-link to="/productos">Productos</router-link></li>
-        <li><i class="fas fa-shopping-cart"></i> <router-link to="/carrito">Carrito</router-link></li>
+        <li><i class="fas fa-shopping-cart"></i> <router-link to="/carrito">Carrito ({{ totalItems }})</router-link></li>
+        <div class="user-info">
+          <p v-if="userName">Bienvenid@, <strong>{{ userName }}</strong></p>
+          <button v-if="userName" @click="logout">Cerrar Sesión</button>
+        </div>
         <li v-if="!userName"><i class="fas fa-user"></i> <router-link to="/login">Login</router-link></li>
       </ul>
     </nav>
@@ -30,10 +31,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { inject, computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import SearchBar from "./BarraBusqueda.vue";
+
+// Mostrar número de productos en el icono del carrito
+const carrito = inject("carrito");
+
+const totalItems = computed(() => {
+  return carrito.value.reduce((total, producto) => total + producto.cantidad, 0);
+});
 
 
 // Estado del menú de navegación

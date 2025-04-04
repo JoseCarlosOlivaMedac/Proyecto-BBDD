@@ -6,7 +6,7 @@
       </div>
   
       <div v-if="carrito.length > 0" class="productos-carrito">
-        <div v-for="(producto, index) in carrito" :key="index" class="producto-item">
+        <div v-for="producto in carrito" :key="producto.id" class="producto-item">
           <img :src="producto.imagen" :alt="producto.nombre" class="producto-imagen" />
           <div class="producto-info">
             <h3>{{ producto.nombre }}</h3>
@@ -21,7 +21,7 @@
               />
               <span class="precio">${{ (producto.precio * producto.cantidad).toFixed(2) }}</span>
             </div>
-            <button @click="eliminarProducto(index)" class="btn-eliminar">Eliminar</button>
+            <button @click="removeFromCart(producto.id)" class="btn-eliminar">Eliminar</button>
           </div>
         </div>
         <div class="total">
@@ -33,36 +33,27 @@
   </template>
   
   <script setup>
-  import { ref, computed } from 'vue';
-  
-  // Lista de productos en el carrito
-  
-  const carrito = ref([     
-                            
-       ]);
-  
-  // Calcular el total del carrito
-  const calcularTotal = () => {
-    return carrito.value.reduce((total, producto) => {
-      return total + producto.precio * producto.cantidad;
-    }, 0);
-  };
-  
-  // Total calculado
-  const total = computed(() => calcularTotal());
-  
-  // Eliminar producto del carrito
-  const eliminarProducto = (index) => {
-    carrito.value.splice(index, 1);
-  };
-  
-  // Acción de checkout (ejemplo, redirigir o mostrar mensaje)
-  const checkout = () => {
-    alert('¡Gracias por tu compra! Te redirigimos a la página de pago.');
-    // Aquí podrías redirigir a otra vista de pago, por ejemplo: router.push('/pago');
-  };
-  </script>
-  
+import {ref, watch, inject, computed } from "vue";
+
+const carrito = inject("carrito");
+const removeFromCart = inject("removeFromCart");
+
+// Calcular el total del carrito
+const total = computed(() => {
+  return carrito.value.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
+});
+
+// Guardar cambios en `localStorage`
+watch(
+  carrito,
+  (nuevoCarrito) => {
+    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+  },
+  { deep: true }
+);
+
+</script>
+
   <style scoped>
   .carrito {
     background-color: #f4f7f6;

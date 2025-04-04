@@ -5,12 +5,12 @@
       
       <div v-if="error" class="error-message">{{ error }}</div>
       <div v-else class="productos-grid">
-        <div v-for="(producto, index) in productos" :key="producto.id" class="producto">
+        <div v-for="producto in productos" :key="producto.id" class="producto">
           <img :src="producto.imagen" :alt="`Imagen de ${producto.nombre}`" />
           <h3>{{ producto.nombre }}</h3>
           <p>{{ producto.descripcion }}</p>
           <span class="precio">${{ producto.precio }}</span>
-          <button class="btn-secundary" @click="agregarAlCarrito(producto)">
+          <button class="btn-secundary" @click="addToCart(producto)">
             Agregar al Carrito
           </button>
         </div>
@@ -19,8 +19,7 @@
   </template>
   
   <script setup>
-  import { ref, onMounted } from "vue";
-  import { inject } from "vue";
+  import { ref, inject, onMounted } from "vue";
   import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
   import { db } from "../firebase";
   
@@ -40,6 +39,8 @@
       console.error(err);
     }
   };
+
+  const addToCart = inject("addToCart");
   
   const actualizarProducto = async (id, nuevosDatos) => {
     try {
