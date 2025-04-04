@@ -13,9 +13,8 @@
     </button>
     <nav :class="{ 'nav-menu': true, 'show': isMenuOpen }">
       <ul>
-        
-        <div>
-          <SearchBar /> 
+        <div class="search-container">
+          <SearchBar />
         </div>
         <li><i class="fas fa-home"></i> <router-link to="/">Inicio</router-link></li>
         <li><i class="fas fa-shopping-bag"></i> <router-link to="/productos">Productos</router-link></li>
@@ -42,7 +41,6 @@ const carrito = inject("carrito");
 const totalItems = computed(() => {
   return carrito.value.reduce((total, producto) => total + producto.cantidad, 0);
 });
-
 
 // Estado del menú de navegación
 const isMenuOpen = ref(false);
@@ -89,6 +87,7 @@ header {
   justify-content: space-between;
   align-items: center;
   position: relative;
+  flex-wrap: wrap;
 }
 
 /* LOGO */
@@ -103,68 +102,14 @@ header {
   transition: transform 0.3s ease-in-out;
 }
 
-  /* Ventana usuario registrado */
-  .navbar {
+/* Barra de búsqueda */
+.search-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  background: #5c36f2;
-  padding: 10px 20px;
-  color: white;
-}
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-left: 0; /* Elimina el margen automático */
-  margin-right: auto;
-}
-
-.user-info p {
-  font-size: 0.8rem; /* Mismo tamaño que el header */
-  font-weight: bold; /* Misma negrita */
-  color: white; /* Asegura que el color sea el mismo */
-}
-
-button {
-  background: #5c36f2;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-button:hover {
-  background: #e67d00;
-}
-
-/* Animación inicial */
-@keyframes popIn {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.animate-logo {
-  animation: popIn 1.2s ease-in-out;
-}
-
-/* Efecto al pasar el mouse */
-.logo h1:hover {
-  transform: rotate(-3deg) scale(1.1);
-}
-
-/* ICONO DEL LOGO */
-.logo i {
-  color: #fff;
-  font-size: 1.5rem;
-}
-.logo:hover {
-  color: #5c36f2;
+  flex: 2;
+  height: 40px; /* Ajustamos la altura para que no quede tan baja */
+  margin-top: -10px; /* Movemos la barra un poco más hacia arriba */
 }
 
 /* MENÚ DE NAVEGACIÓN */
@@ -174,14 +119,14 @@ nav ul {
   margin: 0 50px;
   padding: 0;
   gap: 1.5rem;
+  align-items: center; /* Asegura que los elementos estén centrados verticalmente */
 }
+
 nav ul li {
   position: relative;
   padding: 8px 12px;
   border-radius: 6px;
   transition: color 0.3s ease-in-out;
-  
- 
 }
 
 nav ul li a {
@@ -193,17 +138,13 @@ nav ul li a {
   transition: color 0.3s ease-in-out;
 }
 
-
-/* Aplica el efecto al pasar el ratón sobre <li> o <a> */
 nav ul li:hover a,
 nav ul li:hover i,
 nav ul li a:hover,
 nav ul li a:hover i {
   color: #5c36f2;
-  
 }
 
-/* Línea animada debajo del enlace */
 nav ul li::after {
   content: "";
   position: absolute;
@@ -213,10 +154,8 @@ nav ul li::after {
   height: 2px;
   background-color: #5c36f2;
   transition: width 0.3s ease, left 0.3s ease;
-  
 }
 
-/* Expansión desde el centro al hacer hover */
 nav ul li:hover::after {
   width: 100%;
   left: 0;
@@ -236,6 +175,7 @@ nav ul li:hover::after {
   z-index: 100;
 }
 
+/* Respuesta para pantallas pequeñas */
 @media (max-width: 900px) {
   .menu-burger {
     display: block;
@@ -245,7 +185,7 @@ nav ul li:hover::after {
     position: absolute;
     background: rgba(34, 34, 34, 0.95);
     width: 100%;
-    height: 40vh; 
+    height: 40vh;
     z-index: 99;
     top: 0;
     left: 0;
