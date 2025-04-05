@@ -1,189 +1,258 @@
 <template>
-    <section class="carrito">
-      <div class="carrito-header">
-        <h2>Tu Carrito</h2>
-        <p v-if="carrito.length === 0" class="vacío">Tu carrito está vacío.</p>
-      </div>
-  
-      <div v-if="carrito.length > 0" class="productos-carrito">
-        <div v-for="producto in carrito" :key="producto.id" class="producto-item">
-          <img :src="producto.imagen" :alt="producto.nombre" class="producto-imagen" />
-          <div class="producto-info">
+  <div class="carrito">
+    <h2>Carrito de Compras</h2>
+    <div v-if="carrito.length === 0" class="carrito-vacio">
+      <p>Tu carrito está vacío.</p>
+    </div>
+    <transition-group name="fade" tag="div">
+      <div v-for="producto in carrito" :key="producto.id" class="producto">
+        <div class="info">
+          <img :src="producto.imagen" :alt="producto.nombre" class="imagen-producto" />
+          <div class="detalles">
             <h3>{{ producto.nombre }}</h3>
-            <p class="descripcion">{{ producto.descripcion }}</p>
-            <div class="cantidad-precio">
-              <input 
-                type="number" 
-                v-model="producto.cantidad" 
-                min="1" 
-                class="cantidad" 
-                @input="calcularTotal" 
-              />
-              <span class="precio">${{ (producto.precio * producto.cantidad).toFixed(2) }}</span>
-            </div>
-            <button @click="removeFromCart(producto.id)" class="btn-eliminar">Eliminar</button>
+            <p>Precio unitario: ${{ producto.precio.toFixed(2) }}</p>
           </div>
         </div>
-        <div class="total">
-          <p><strong>Total:</strong> ${{ total.toFixed(2) }}</p>
-          <button class="btn-primary" @click="checkout">Realizar Compra</button>
+        <div class="cantidad-precio">
+          <div class="cantidad-control">
+            <button @click="decrementarCantidad(producto)">-</button>
+            <input type="number" v-model.number="producto.cantidad" min="1" class="cantidad" />
+            <button @click="incrementarCantidad(producto)">+</button>
+          </div>
+          <span class="precio">${{ (producto.precio * producto.cantidad).toFixed(2) }}</span>
         </div>
+        <button @click="confirmarEliminacion(producto)" class="eliminar">Eliminar</button>
       </div>
-    </section>
-  </template>
-  
-  <script setup>
-import {ref, watch, inject, computed } from "vue";
+    </transition-group>
 
-const carrito = inject("carrito");
-const removeFromCart = inject("removeFromCart");
+    <div v-if="carrito.length > 0" class="total">
+      <h3>Total: ${{ total.toFixed(2) }}</h3>
+      <button @click="vaciarCarrito" class="vaciar-carrito">Vaciar Carrito 🗑️</button>
+    </div>
+  </div>
+</template>
 
-// Calcular el total del carrito
-const total = computed(() => {
-  return carrito.value.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
+<script setup>
+import { ref, watch, onMounted, computed, inject } from 'vue';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase'; // Asegúrate de que db está correctamente configurado
+
+const carrito = ref([]);
+
+// Inyectamos la función addToCart desde el componente principal
+const addToCart = inject('addToCart');
+
+// Al montar el componente, se verifica si hay productos en el localStorage y se cargan
+onMounted(() => {
+  const storedCart = JSON.parse(localStorage.getItem('carrito'));
+  if (storedCart) {
+    carrito.value = storedCart;
+  }
 });
 
-// Guardar cambios en `localStorage`
-watch(
-  carrito,
-  (nuevoCarrito) => {
-    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-  },
-  { deep: true }
-);
+// Cuando el carrito cambie, se guarda en el localStorage
+watch(carrito, (nuevoCarrito) => {
+  localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
+}, { deep: true });
 
+// Cálculo total del carrito
+const total = computed(() => carrito.value.reduce((sum, producto) => sum + producto.precio * producto.cantidad, 0));
+
+// Incrementar cantidad de un producto
+const incrementarCantidad = (producto) => {
+  if (producto.cantidad < producto.stock) {
+    producto.cantidad++;
+    actualizarCarrito(producto);
+  } else {
+    alert("No hay suficiente stock para este producto.");
+  }
+};
+
+// Decrementar cantidad de un producto
+const decrementarCantidad = (producto) => {
+  if (producto.cantidad > 1) {
+    producto.cantidad--;
+    actualizarCarrito(producto);
+  }
+};
+
+// Confirmación para eliminar un producto del carrito
+const confirmarEliminacion = (producto) => {
+  if (confirm(`¿Estás seguro de que quieres eliminar "${producto.nombre}" del carrito?`)) {
+    eliminarDelCarrito(producto);
+  }
+};
+
+// Eliminar un producto del carrito
+const eliminarDelCarrito = (producto) => {
+  carrito.value = carrito.value.filter(p => p.id !== producto.id);
+  actualizarCarrito();
+};
+
+// Vaciar el carrito
+const vaciarCarrito = () => {
+  if (confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
+    carrito.value = [];
+    actualizarCarrito();
+  }
+};
+
+// Actualiza el carrito y sincroniza con Firebase
+const actualizarCarrito = (productoModificado) => {
+  // Actualizamos el carrito en el localStorage
+  localStorage.setItem('carrito', JSON.stringify(carrito.value));
+
+  // Si hemos modificado el producto, actualizamos el stock en Firebase
+  if (productoModificado) {
+    // Actualizar el stock en Firebase
+    const productoRef = doc(db, "camisetas", productoModificado.id);
+    updateDoc(productoRef, {
+      stock: productoModificado.stock - productoModificado.cantidad
+    }).then(() => {
+      console.log("Stock actualizado en Firebase");
+    }).catch((error) => {
+      console.error("Error al actualizar stock en Firebase", error);
+    });
+  }
+};
 </script>
 
-  <style scoped>
-  .carrito {
-    background-color: #f4f7f6;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    margin: 2rem auto;
-    max-width: 1200px;
-  }
-  
-  .carrito-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-  }
-  
-  .carrito-header h2 {
-    font-size: 2rem;
-    color: #333;
-  }
-  
-  .vacío {
-    font-size: 1.2rem;
-    color: #777;
-  }
-  
-  .productos-carrito {
-    display: flex;
+<style scoped>
+.carrito {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.carrito h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.producto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.imagen-producto {
+  width: 80px;
+  height: auto;
+  border-radius: 8px;
+  margin-right: 1rem;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+}
+
+.detalles h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.detalles p {
+  margin: 0;
+  color: #555;
+}
+
+.cantidad-precio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cantidad-control {
+  display: flex;
+  align-items: center;
+}
+
+.cantidad-control button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.cantidad-control input {
+  width: 50px;
+  text-align: center;
+  margin: 0 0.3rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  padding: 0.2rem;
+}
+
+.precio {
+  font-weight: bold;
+}
+
+.eliminar {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.total {
+  text-align: center;
+  margin-top: 2rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.vaciar-carrito {
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+/* Animaciones */
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .producto {
     flex-direction: column;
-    gap: 1.5rem;
+    align-items: flex-start;
   }
-  
-  .producto-item {
-    background: #fff;
-    padding: 1.2rem;
-    display: flex;
-    gap: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    align-items: center;
-  }
-  
-  .producto-imagen {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-  
-  .producto-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .producto-info h3 {
-    font-size: 1.3rem;
-    margin: 0.5rem 0;
-    color: #222;
-  }
-  
-  .descripcion {
-    font-size: 1rem;
-    color: #777;
-    margin-bottom: 1rem;
-  }
-  
+
   .cantidad-precio {
-    display: flex;
+    width: 100%;
     justify-content: space-between;
-    align-items: center;
-    margin: 1rem;
+    margin-top: 0.5rem;
   }
-  
-  .cantidad {
-    width: 50px;
-    padding: 0.5rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
+
+  .total h3 {
+    font-size: 1.2rem;
   }
-  
-  .precio {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #222;
-  }
-  
-  .btn-eliminar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px;
-    background-color: #ff4c4c;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    margin: auto;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-  }
-  
-  .btn-eliminar:hover {
-    background-color: #e43f3f;
-  }
-  
-  .total {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-  }
-  
-  .btn-primary {
-    background-color: #5c36f2;
-    color: white;
-    padding: 0.7rem 1.5rem;
-    border-radius: 6px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .btn-primary:hover {
-    background-color: #e67d00;
-  }
-  </style>
-  
+}
+</style>

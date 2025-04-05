@@ -19,10 +19,14 @@
         <li><i class="fas fa-home"></i> <router-link to="/">Inicio</router-link></li>
         <li><i class="fas fa-shopping-bag"></i> <router-link to="/productos">Productos</router-link></li>
         <li><i class="fas fa-shopping-cart"></i> <router-link to="/carrito">Carrito ({{ totalItems }})</router-link></li>
-        <div class="user-info">
-          <p v-if="userName">Bienvenid@, <strong>{{ userName }}</strong></p>
-          <button v-if="userName" @click="logout">Cerrar Sesión</button>
+
+        <!-- Muestra la información del usuario si está logueado -->
+        <div class="user-info" v-if="userName">
+          <p>Bienvenid@, <strong>{{ userName }}</strong></p>
+          <button @click="logout">Cerrar Sesión</button>
         </div>
+
+        <!-- Muestra el enlace de Login si no está logueado -->
         <li v-if="!userName"><i class="fas fa-user"></i> <router-link to="/login">Login</router-link></li>
       </ul>
     </nav>
@@ -65,14 +69,17 @@ onMounted(() => {
   });
 });
 
-// Función para cerrar sesión
+// Función para cerrar sesión con confirmación
 const logout = async () => {
-  try {
-    await signOut(auth); // Cierra sesión en Firebase
-    userName.value = ""; // Limpia el nombre del usuario
-    router.push("/"); // Redirige al inicio
-  } catch (error) {
-    console.error("Error al cerrar sesión:", error);
+  const confirmLogout = window.confirm("¿Estás seguro que deseas cerrar sesión?");
+  if (confirmLogout) {
+    try {
+      await signOut(auth); // Cierra sesión en Firebase
+      userName.value = ""; // Limpia el nombre del usuario
+      router.push("/"); // Redirige al inicio
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   }
 };
 </script>
@@ -215,5 +222,16 @@ nav ul li:hover::after {
   .nav-menu ul li a {
     font-size: 1.3rem;
   }
+}
+
+/* Estilo para la sección de usuario (alinear horizontalmente) */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info p {
+  margin: 0;
 }
 </style>
