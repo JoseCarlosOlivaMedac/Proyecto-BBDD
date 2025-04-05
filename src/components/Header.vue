@@ -192,7 +192,7 @@ nav ul li:hover::after {
     position: absolute;
     background: rgba(34, 34, 34, 0.95);
     width: 100%;
-    height: 40vh;
+    height: 45vh;
     z-index: 99;
     top: 0;
     left: 0;
@@ -212,6 +212,8 @@ nav ul li:hover::after {
   .nav-menu ul {
     flex-direction: column;
     gap: 40px;
+    padding: 0;
+    margin-top: 0;
   }
 
   .nav-menu ul li {
