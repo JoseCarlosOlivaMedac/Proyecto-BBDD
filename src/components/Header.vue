@@ -115,8 +115,8 @@ header {
   justify-content: center;
   align-items: center;
   flex: 2;
-  height: 40px; /* Ajustamos la altura para que no quede tan baja */
-  margin-top: -10px; /* Movemos la barra un poco más hacia arriba */
+  height: 40px; 
+  margin-top: 1px; 
 }
 
 /* MENÚ DE NAVEGACIÓN */
