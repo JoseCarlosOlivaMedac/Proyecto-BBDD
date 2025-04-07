@@ -204,7 +204,7 @@ const cerrarFormulario = () => {
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 90%;
-  min-height: 68vh;
+  min-height: 75vh;
   margin: 2rem auto;
   max-width: 1200px;
 }

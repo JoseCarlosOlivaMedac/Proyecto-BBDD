@@ -1,37 +1,84 @@
 <template>
   <div class="wrapper">
     <h1>PRODUCTOS</h1>
-    
+
+ <!-- Selector de modo con iconos animados -->
+<div class="modo-selector">
+  <div 
+    class="modo-opcion" 
+    :class="{ activo: modoVisualizacion === 'paginacion' }"
+    @click="modoVisualizacion = 'paginacion'"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="icono" viewBox="0 0 24 24">
+      <path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>
+    <span>Paginación</span>
+  </div>
+  <div 
+    class="modo-opcion" 
+    :class="{ activo: modoVisualizacion === 'scroll' }"
+    @click="modoVisualizacion = 'scroll'"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="icono" viewBox="0 0 24 24">
+      <path d="M12 4v16m-6-6l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>
+    <span>Scroll Infinito</span>
+  </div>
+</div>
+
     <!-- Notificación de producto agregado -->
     <div v-if="showNotification" class="notification">
       {{ notificationMessage }}
     </div>
-    
+
     <div class="productos-container">
       <div v-if="loading" class="loading-message">Cargando productos...</div>
       <div v-else-if="error" class="error-message">{{ error }}</div>
       <div v-else-if="productos.length === 0" class="empty-message">No hay productos disponibles</div>
-      <div v-else class="productos-grid">
-        <div v-for="producto in productos" :key="producto.id" class="producto">
-          <div class="producto-imagen-container">
-            <img 
-              :src="producto.imagenUrl || placeholderImage" 
-              :alt="'Imagen de ' + producto.nombre"
-              class="producto-imagen"
-              @error="handleImageError"
-            >
+      <div v-else>
+        <div class="productos-grid">
+          <div
+            v-for="producto in productosMostrados"
+            :key="producto.id"
+            class="producto"
+          >
+            <div class="producto-imagen-container">
+              <img 
+                :src="producto.imagenUrl || placeholderImage" 
+                :alt="'Imagen de ' + producto.nombre"
+                class="producto-imagen"
+                @error="handleImageError"
+              >
+            </div>
+            <div class="producto-info">
+              <h2 class="producto-nombre">{{ producto.nombre }}</h2>
+              <p class="producto-descripcion">{{ producto.descripcion }}</p>
+              <p class="producto-precio">${{ formatPrice(producto.precio) }}</p>
+              <ButtonCarrito 
+                :productoId="producto.id" 
+                @producto-agregado="handleProductoAgregado"
+                @error-carrito="handleErrorCarrito"
+                class="buttonCarrito"
+              />
+            </div>
           </div>
-          <div class="producto-info">
-            <h2 class="producto-nombre">{{ producto.nombre }}</h2>
-            <p class="producto-descripcion">{{ producto.descripcion }}</p>
-            <p class="producto-precio">${{ formatPrice(producto.precio) }}</p>
-            <ButtonCarrito 
-              :productoId="producto.id" 
-              @producto-agregado="handleProductoAgregado"
-              @error-carrito="handleErrorCarrito"
-              class="buttonCarrito"
-            />
-          </div>
+        </div>
+
+        <!-- Controles de paginación -->
+        <div class="pagination" v-if="modoVisualizacion === 'paginacion'">
+          <button
+            :disabled="currentPage === 1"
+            @click="changePage(currentPage - 1)"
+          >
+            Anterior
+          </button>
+          <span>Página {{ currentPage }} de {{ totalPages }}</span>
+          <button
+            :disabled="currentPage === totalPages"
+            @click="changePage(currentPage + 1)"
+          >
+            Siguiente
+          </button>
         </div>
       </div>
     </div>
@@ -47,21 +94,39 @@ export default {
   components: {
     ButtonCarrito
   },
-  
+
   name: "Productos",
-  
+
   data() {
     return {
       productos: [],
+      currentPage: 1,
+      itemsPerPage: 4,
+      scrollLimit: 4,
       loading: true,
       error: null,
       placeholderImage: '/imagenes/placeholder.jpg',
       showNotification: false,
       notificationMessage: '',
-      notificationTimeout: null
+      notificationTimeout: null,
+      modoVisualizacion: "paginacion"
     };
   },
-  
+
+  computed: {
+    totalPages() {
+      return Math.ceil(this.productos.length / this.itemsPerPage);
+    },
+    productosMostrados() {
+      if (this.modoVisualizacion === "scroll") {
+        return this.productos.slice(0, this.scrollLimit);
+      } else {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.productos.slice(start, start + this.itemsPerPage);
+      }
+    }
+  },
+
   methods: {
     async fetchProductos() {
       try {
@@ -86,13 +151,12 @@ export default {
         this.loading = false;
       }
     },
-    
+
     formatPrice(price) {
       return Number(price).toLocaleString("es-ES");
     },
-    
+
     handleImageError(event) {
-      console.log('Error cargando imagen', event.target.src);
       event.target.src = this.placeholderImage;
       event.target.onerror = null;
       event.target.style.objectFit = 'contain';
@@ -102,47 +166,70 @@ export default {
       const num = parseInt(productId.replace(/\D/g, '')) || 1;
       return `/imagenes/producto(${Math.min(num, 20)}).jpg`;
     },
-    
+
     handleProductoAgregado(producto) {
-      console.log('Producto agregado:', producto);
       this.showNotificationMessage(`${producto.nombre} añadido al carrito`);
     },
-    
+
     handleErrorCarrito(error) {
-      console.error('Error en carrito:', error);
       this.showNotificationMessage(`Error al agregar producto: ${error.mensaje}`, true);
     },
-    
+
     showNotificationMessage(message, isError = false) {
       this.notificationMessage = message;
       this.showNotification = true;
-      
-      // Estilo diferente para errores
+
       if (isError) {
         const notificationEl = document.querySelector('.notification');
         if (notificationEl) {
           notificationEl.style.backgroundColor = '#ff6b6b';
         }
       }
-      
-      // Oculta la notificación después de 3 segundos
+
       clearTimeout(this.notificationTimeout);
       this.notificationTimeout = setTimeout(() => {
         this.showNotification = false;
       }, 3000);
+    },
+
+    changePage(page) {
+      this.currentPage = page;
+    },
+
+    handleScroll() {
+      const bottomOfWindow = window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 50;
+
+      if (bottomOfWindow && this.scrollLimit < this.productos.length) {
+        this.scrollLimit += 4;
+      }
     }
   },
 
   async mounted() {
     await this.fetchProductos();
+
+    if (this.modoVisualizacion === "scroll") {
+      window.addEventListener("scroll", this.handleScroll);
+    }
   },
-  
+
+  watch: {
+    modoVisualizacion(nuevoModo, anteriorModo) {
+      if (nuevoModo === "scroll") {
+        this.scrollLimit = 4;
+        window.addEventListener("scroll", this.handleScroll);
+      } else {
+        window.removeEventListener("scroll", this.handleScroll);
+      }
+    }
+  },
+
   beforeUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
     clearTimeout(this.notificationTimeout);
   }
 };
 </script>
-
 
 <style scoped>
 
@@ -271,5 +358,86 @@ h1{
 @keyframes fadeOut {
   from { opacity: 1; top: 20px; }
   to { opacity: 0; top: 0; }
+}
+
+
+/* Estilos de paginación */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  background-color: #5c36f2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #4a2ecb;
+}
+
+.pagination span {
+  font-size: 1rem;
+  color: #333;
+}.modo-selector {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.modo-opcion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f1f1f1;
+  border-radius: 12px;
+  padding: 1rem;
+  width: 120px;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.modo-opcion:hover {
+  transform: scale(1.05);
+  background-color: #e4e4e4;
+}
+
+.modo-opcion.activo {
+  background-color: #5c36f2;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(92, 54, 242, 0.3);
+}
+
+.modo-opcion .icono {
+  width: 32px;
+  height: 32px;
+  transition: transform 0.3s ease;
+}
+
+.modo-opcion.activo .icono {
+  transform: rotate(360deg);
+}
+
+.modo-opcion span {
+  font-size: 0.9rem;
+  font-weight: bold;
 }
 </style>
