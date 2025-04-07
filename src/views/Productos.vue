@@ -1,30 +1,31 @@
 <template>
   <div class="wrapper">
     <h1>PRODUCTOS</h1>
+    <SearchBar @search="handleSearch" />
 
- <!-- Selector de modo con iconos animados -->
-<div class="modo-selector">
-  <div 
-    class="modo-opcion" 
-    :class="{ activo: modoVisualizacion === 'paginacion' }"
-    @click="modoVisualizacion = 'paginacion'"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" class="icono" viewBox="0 0 24 24">
-      <path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
-    </svg>
-    <span>Paginación</span>
-  </div>
-  <div 
-    class="modo-opcion" 
-    :class="{ activo: modoVisualizacion === 'scroll' }"
-    @click="modoVisualizacion = 'scroll'"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" class="icono" viewBox="0 0 24 24">
-      <path d="M12 4v16m-6-6l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
-    </svg>
-    <span>Scroll Infinito</span>
-  </div>
-</div>
+    <!-- Selector de modo con iconos animados -->
+    <div class="modo-selector">
+      <div 
+        class="modo-opcion" 
+        :class="{ activo: modoVisualizacion === 'paginacion' }"
+        @click="modoVisualizacion = 'paginacion'"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="icono" viewBox="0 0 24 24">
+          <path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span>Paginación</span>
+      </div>
+      <div 
+        class="modo-opcion" 
+        :class="{ activo: modoVisualizacion === 'scroll' }"
+        @click="modoVisualizacion = 'scroll'"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="icono" viewBox="0 0 24 24">
+          <path d="M12 4v16m-6-6l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span>Scroll Infinito</span>
+      </div>
+    </div>
 
     <!-- Notificación de producto agregado -->
     <div v-if="showNotification" class="notification">
@@ -34,7 +35,9 @@
     <div class="productos-container">
       <div v-if="loading" class="loading-message">Cargando productos...</div>
       <div v-else-if="error" class="error-message">{{ error }}</div>
-      <div v-else-if="productos.length === 0" class="empty-message">No hay productos disponibles</div>
+      <div v-else-if="productosMostrados.length === 0" class="empty-message">
+        {{ isSearching ? 'No se encontraron productos' : 'No hay productos disponibles' }}
+      </div>
       <div v-else>
         <div class="productos-grid">
           <div
@@ -65,7 +68,7 @@
         </div>
 
         <!-- Controles de paginación -->
-        <div class="pagination" v-if="modoVisualizacion === 'paginacion'">
+        <div class="pagination" v-if="modoVisualizacion === 'paginacion' && productosMostrados.length > 0">
           <button
             :disabled="currentPage === 1"
             @click="changePage(currentPage - 1)"
@@ -89,10 +92,12 @@
 import { db } from '../firebase';
 import { ref as dbRef, get } from "firebase/database";
 import ButtonCarrito from "../components/ButtonCarrito.vue";
+import SearchBar from '../components/SearchBar.vue';
 
 export default {
   components: {
-    ButtonCarrito
+    ButtonCarrito,
+    SearchBar
   },
 
   name: "Productos",
@@ -100,6 +105,8 @@ export default {
   data() {
     return {
       productos: [],
+      filteredProducts: [],
+      isSearching: false,
       currentPage: 1,
       itemsPerPage: 4,
       scrollLimit: 4,
@@ -115,14 +122,17 @@ export default {
 
   computed: {
     totalPages() {
-      return Math.ceil(this.productos.length / this.itemsPerPage);
+      const sourceProducts = this.isSearching ? this.filteredProducts : this.productos;
+      return Math.ceil(sourceProducts.length / this.itemsPerPage);
     },
     productosMostrados() {
+      const sourceProducts = this.isSearching ? this.filteredProducts : this.productos;
+      
       if (this.modoVisualizacion === "scroll") {
-        return this.productos.slice(0, this.scrollLimit);
+        return sourceProducts.slice(0, this.scrollLimit);
       } else {
         const start = (this.currentPage - 1) * this.itemsPerPage;
-        return this.productos.slice(start, start + this.itemsPerPage);
+        return sourceProducts.slice(start, start + this.itemsPerPage);
       }
     }
   },
@@ -194,14 +204,37 @@ export default {
 
     changePage(page) {
       this.currentPage = page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
     handleScroll() {
       const bottomOfWindow = window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 50;
 
-      if (bottomOfWindow && this.scrollLimit < this.productos.length) {
+      if (bottomOfWindow && this.scrollLimit < (this.isSearching ? this.filteredProducts.length : this.productos.length)) {
         this.scrollLimit += 4;
       }
+    },
+
+    handleSearch(query) {
+      if (!query.trim()) {
+        this.isSearching = false;
+        this.currentPage = 1;
+        this.scrollLimit = 4;
+        return;
+      }
+      
+      this.isSearching = true;
+      const searchTerm = query.toLowerCase();
+      
+      this.filteredProducts = this.productos.filter(producto => {
+        return (
+          producto.nombre.toLowerCase().includes(searchTerm) ||
+          producto.descripcion.toLowerCase().includes(searchTerm)
+        );
+      });
+      
+      this.currentPage = 1;
+      this.scrollLimit = 4;
     }
   },
 
@@ -214,7 +247,7 @@ export default {
   },
 
   watch: {
-    modoVisualizacion(nuevoModo, anteriorModo) {
+    modoVisualizacion(nuevoModo) {
       if (nuevoModo === "scroll") {
         this.scrollLimit = 4;
         window.addEventListener("scroll", this.handleScroll);
@@ -232,7 +265,6 @@ export default {
 </script>
 
 <style scoped>
-
 h1{ 
   text-align: center;
   margin: 2rem 0;
@@ -251,7 +283,8 @@ h1{
 }
 
 .loading-message,
-.empty-message {
+.empty-message,
+.error-message {
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
@@ -273,6 +306,10 @@ h1{
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.producto:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
 .producto-imagen-container {
   height: 200px;
@@ -288,6 +325,9 @@ h1{
   transition: transform 0.3s ease;
 }
 
+.producto:hover .producto-imagen {
+  transform: scale(1.05);
+}
 
 .producto-info {
   padding: 1.2rem;
@@ -326,16 +366,13 @@ h1{
   }
 }
 
-.buttonCarrito{
+.buttonCarrito {
   margin-top: 1rem;
   display: flex;
   justify-content: center;
 }
 
-
-/*Estilos para la ventana emergente al agregar al carro */
-
-
+/* Estilos para la ventana emergente al agregar al carro */
 .notification {
   position: fixed;
   top: 20px;
@@ -359,7 +396,6 @@ h1{
   from { opacity: 1; top: 20px; }
   to { opacity: 0; top: 0; }
 }
-
 
 /* Estilos de paginación */
 .pagination {
@@ -392,7 +428,9 @@ h1{
 .pagination span {
   font-size: 1rem;
   color: #333;
-}.modo-selector {
+}
+
+.modo-selector {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
