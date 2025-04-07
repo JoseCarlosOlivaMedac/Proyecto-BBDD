@@ -99,7 +99,7 @@
   .mis-pedidos {
     padding: 2rem;
     max-width: 900px;
-    height: 68vh;
+    height: 78vh;
     margin: 0 auto;
     background-color: #f4f7f6;
     border-radius: 8px;

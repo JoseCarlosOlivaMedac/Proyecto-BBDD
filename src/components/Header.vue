@@ -334,7 +334,6 @@ nav {
     transform: translateY(-100%);
     transition: transform 0.4s ease-in-out;
     z-index: 100;
-    padding-top: 5rem;
   }
 
   .nav--open {
