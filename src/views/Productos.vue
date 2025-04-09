@@ -90,7 +90,8 @@
 
 <script>
 import { db } from '../firebase';
-import { ref as dbRef, get } from "firebase/database";
+import { ref as dbRef, get, onValue, set } from "firebase/database";
+import { getMessaging, getToken } from "firebase/messaging";
 import ButtonCarrito from "../components/ButtonCarrito.vue";
 import SearchBar from '../components/SearchBar.vue';
 
@@ -151,6 +152,14 @@ export default {
             ...data,
             imagenUrl: this.getImageUrl(id)
           }));
+
+          // Mostrar el stock en la consola
+          this.productos.forEach(producto => {
+            console.log (`Producto: ${producto.nombre}, Stock: ${producto.stock}`);
+          })
+
+          // Registrar observadores para cambios en el stock
+          this.observeStockChanges();
         } else {
           this.productos = [];
         }
@@ -161,6 +170,83 @@ export default {
         this.loading = false;
       }
     },
+
+    // Observa los cambios en el stock de los productos
+    observeStockChanges() {
+      const productosRef = dbRef(db, "productos");
+      onValue(productosRef, (snapshot) => {
+        const productos = snapshot.val();
+        if (productos) {
+          Object.entries(productos).forEach(([id, data]) => {
+            if (data.stock < 10) {
+              console.warn(`El producto ${data.nombre} tiene un stock bajo: ${data.stock}`);
+              this.sendLowStockNotification(data.nombre, data.stock)
+            }
+          });
+        }
+      });
+    },
+
+    // Actualiza el stock de un producto
+    async actualizarStock(productoId, cantidad) {
+  try {
+    const productoRef = dbRef(db, `productos/${productoId}/stock`);
+    const snapshot = await get(productoRef);
+
+    if (snapshot.exists()) {
+      const stockActual = snapshot.val();
+      console.log(`Stock actual para el producto ${productoId}: ${stockActual}`);
+      console.log(`Cantidad solicitada: ${cantidad}`);
+
+      if (typeof stockActual !== 'number' || stockActual < 0) {
+        console.error(`El stock actual no es válido para el producto ${productoId}: ${stockActual}`);
+        this.showNotificationMessage(`Error: El stock actual no es válido para el producto ${productoId}.`, true);
+        return;
+      }
+
+      if (typeof cantidad !== 'number' || cantidad <= 0) {
+        console.error(`La cantidad solicitada no es válida: ${cantidad}`);
+        this.showNotificationMessage(`Error: La cantidad solicitada no es válida.`, true);
+        return;
+      }
+
+      const nuevoStock = stockActual - cantidad;
+      console.log(`Nuevo stock calculado para el producto ${productoId}: ${nuevoStock}`);
+
+      if (nuevoStock >= 0) {
+        await set (productoRef, nuevoStock);
+        console.log(`Stock actualizado para el producto ${productoId}: ${nuevoStock}`);
+      } else {
+        console.warn(`No hay suficiente stock para el producto ${productoId}.`);
+        this.showNotificationMessage(`No hay suficiente stock para el producto ${productoId}.`, true);
+      }
+    } else {
+      console.error(`El producto con ID ${productoId} no existe.`);
+      this.showNotificationMessage(`El producto con ID ${productoId} no existe.`, true);
+    }
+  } catch (error) {
+    console.error("Error al actualizar el stock:", error);
+    this.showNotificationMessage("Error al actualizar el stock. Inténtalo de nuevo.", true);
+  }
+},
+    // Envía una notificación cuando el stock es bajo
+    async sendLowStockNotification(productName, stock) {
+      try {
+        const messaging = getMessaging();
+        const token = await getToken(messaging, { vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY });
+
+        if (token) {
+          // Aquí puedes enviar el token y el mensaje al servidor para manejar la notificación
+          console.log(`Notificación enviada: El producto ${productName} tiene un stock bajo (${stock}).`);
+        } else {
+          console.error("No se pudo obtener el token de Firebase Messaging.");
+        }
+      } catch (error) {
+        console.error("Error al enviar notificación de stock bajo:", error);
+      }
+    },
+
+
 
     formatPrice(price) {
       return Number(price).toLocaleString("es-ES");
@@ -177,11 +263,16 @@ export default {
       return `/imagenes/producto(${Math.min(num, 20)}).jpg`;
     },
 
-    handleProductoAgregado(producto) {
-      this.showNotificationMessage(`${producto.nombre} añadido al carrito`);
+    handleProductoAgregado({id, nombre, cantidad}) {
+      console.log('Producto agregado:', id, 'Cantidad: ', cantidad);
+      this.showNotificationMessage(`${nombre} añadido al carrito`);
+
+      // Actualizar stock del producto en Firebase
+      this.actualizarStock(id, cantidad);
     },
 
     handleErrorCarrito(error) {
+      console.error('Error en carrito:', error);
       this.showNotificationMessage(`Error al agregar producto: ${error.mensaje}`, true);
     },
 
@@ -196,6 +287,7 @@ export default {
         }
       }
 
+      // Oculta la notificación después de 3 segundos
       clearTimeout(this.notificationTimeout);
       this.notificationTimeout = setTimeout(() => {
         this.showNotification = false;
