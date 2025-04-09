@@ -101,7 +101,7 @@
     max-width: 900px;
     height: 78vh;
     margin: 0 auto;
-    background-color: #f4f7f6;
+    background-color: var(--color-content-background);
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
@@ -121,7 +121,7 @@
   .no-pedidos {
     text-align: center;
     font-size: 1.2rem;
-    color: #666;
+    color: var(--color-text);;
   }
   
   .pedidos-list {
@@ -131,7 +131,7 @@
   }
   
   .pedido-item {
-    background: white;
+    background: var(--color-card-background);
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -143,12 +143,12 @@
   
   .pedido-header h2 {
     margin: 0;
-    color: #333;
+    color: var(--color-text);
   }
   
   .pedido-header p {
     margin: 0.3rem 0;
-    color: #555;
+    color: var (--color-text-secondary);
   }
   
   .productos-list {
@@ -163,7 +163,7 @@
     display: flex;
     justify-content: space-between;
     margin: 0.5rem 0;
-    color: #444;
+    color: var(--color-text-secondary);
   }
   
   .pedido-actions {

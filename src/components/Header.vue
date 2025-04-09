@@ -387,7 +387,7 @@ nav {
 .modal {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--color-card-background);
   border-radius: 8px;
   padding: 1rem 2rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -406,7 +406,7 @@ nav {
   padding: 0.8rem 0;
   font-size: 1.1rem;
   font-weight: bold;
-  color: #222;
+  color: var(--color-text);
   cursor: pointer;
   transition: background-color 0.3s ease-in-out;
 }
