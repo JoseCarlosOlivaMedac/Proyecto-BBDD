@@ -1,6 +1,7 @@
 import { initializeApp, getApp } from "firebase/app";  // Importa las funciones necesarias para inicializar y obtener la app de Firebase
 import { getDatabase } from "firebase/database";  // Importa la función para obtener la referencia a la base de datos en tiempo real de Firebase
 import { getAuth } from "firebase/auth";  // Importa la función para obtener la referencia a la autenticación de Firebase
+import { getMessaging, getToken, onMessage } from "firebase/messaging"; //Importa la función para obtener la referencia al servicio de mensajería de Firebase
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -29,5 +30,11 @@ const db = getDatabase(firebaseApp);
 // Inicializa el servicio de autenticación de Firebase
 const auth = getAuth(firebaseApp);
 
-// Exporta la referencia a la base de datos y la autenticación para que otros módulos puedan utilizarlas
-export { db, auth };
+
+// Inicializar el servicio de mensajería
+const messaging = getMessaging(firebaseApp);
+
+
+
+// Exporta la referencia a la base de datos, autenticación y mensajería para que otros módulos puedan utilizarlas
+export { db, auth, messaging, getToken, onMessage };

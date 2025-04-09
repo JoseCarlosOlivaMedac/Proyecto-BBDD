@@ -71,7 +71,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { db } from '../firebase';
-import { ref as dbRef, onValue, remove, update, set } from 'firebase/database';
+import { ref as dbRef, onValue, remove, update, set, get } from 'firebase/database';
 
 const carrito = ref([]);
 const mostrarFormulario = ref(false);
@@ -121,23 +121,81 @@ const total = computed(() => {
   }, 0);
 });
 
-// Actualizar cantidad en Firebase con validación
+// Actualizar cantidad en Firebase con validación y ajustar stock
 const actualizarCantidad = async (productId, nuevaCantidad) => {
-  const cantidad = Math.max(1, Number(nuevaCantidad) || 1);
   try {
     const productoRef = dbRef(db, `carrito/${productId}`);
-    await update(productoRef, { cantidad });
+    const productoSnapshot = await get(productoRef);
+
+    if (productoSnapshot.exists()) {
+      const producto = productoSnapshot.val();
+      const cantidadAnterior = producto.cantidad;
+      const diferencia = nuevaCantidad - cantidadAnterior;
+
+      // Validar que la nueva cantidad sea válida
+      if (nuevaCantidad < 1) {
+        alert('La cantidad no puede ser menor a 1.');
+        return;
+      }
+
+      // Actualizar el stock en Firebase
+      const stockRef = dbRef(db, `productos/${productId}/stock`);
+      const stockSnapshot = await get(stockRef);
+
+      if (stockSnapshot.exists()) {
+        const stockActual = stockSnapshot.val();
+        const nuevoStock = stockActual - diferencia;
+
+        if (nuevoStock >= 0) {
+          await update(dbRef(db, `productos/${productId}`), { stock: nuevoStock });
+          console.log(`Stock actualizado para el producto ${productId}: ${nuevoStock}`);
+        } else {
+          alert('No hay suficiente stock disponible.');
+          return;
+        }
+      }
+
+      // Actualizar la cantidad en el carrito
+      await update(productoRef, { cantidad: nuevaCantidad });
+      console.log(`Cantidad actualizada para el producto ${productId}: ${nuevaCantidad}`);
+    }
   } catch (error) {
     console.error('Error al actualizar cantidad:', error);
-    // Podrías mostrar una notificación al usuario aquí
+    alert('Hubo un error al actualizar la cantidad. Por favor, inténtalo de nuevo.');
   }
 };
 
-// Eliminar producto del carrito con confirmación
-const eliminarProducto = (productId) => {
+// Eliminar producto del carrito con confirmación y restaurar stock
+const eliminarProducto = async (productId) => {
   if (confirm('¿Estás seguro de eliminar este producto del carrito?')) {
-    const productoRef = dbRef(db, `carrito/${productId}`);
-    remove(productoRef);
+    try {
+      // Referencia al producto en el carrito
+      const productoRef = dbRef(db, `carrito/${productId}`);
+      const productoSnapshot = await get(productoRef);
+
+      if (productoSnapshot.exists()) {
+        const producto = productoSnapshot.val();
+        const cantidadEnCarrito = producto.cantidad;
+
+        // Restaurar el stock del producto
+        const stockRef = dbRef(db, `productos/${productId}/stock`);
+        const stockSnapshot = await get(stockRef);
+
+        if (stockSnapshot.exists()) {
+          const stockActual = stockSnapshot.val();
+          const nuevoStock = stockActual + cantidadEnCarrito;
+
+          await update(dbRef(db, `productos/${productId}`), { stock: nuevoStock });
+          console.log(`Stock restaurado para el producto ${productId}: ${nuevoStock}`);
+        }
+      }
+
+      // Eliminar el producto del carrito
+      await remove(productoRef);
+      console.log(`Producto ${productId} eliminado del carrito.`);
+    } catch (error) {
+      console.error('Error al eliminar producto del carrito:', error);
+    }
   }
 };
 

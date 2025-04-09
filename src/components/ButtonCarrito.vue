@@ -15,7 +15,7 @@
     }
   });
   
-  const emit = defineEmits(['producto-agregado']);
+  const emit = defineEmits(['producto-agregado', 'error-carrito']);
   
   const agregarAlCarrito = async () => {
     try {
@@ -38,6 +38,8 @@
       // 3. Referencia al carrito
       const carritoRef = dbRef(db, `carrito/${props.productoId}`);
       const carritoSnapshot = await get(carritoRef);
+
+      let cantidad = 1; //Cantidad predeterminada al agregar al carrito
   
       // 4. Lógica para añadir/actualizar
       if (carritoSnapshot.exists()) {
@@ -63,12 +65,13 @@
       console.log('✅ Producto actualizado en carrito:', {
         id: props.productoId,
         nombre: productoData.nombre,
-        precio: productoData.precio
+        cantidad
       });
       
       emit('producto-agregado', {
         id: props.productoId,
-        nombre: productoData.nombre
+        nombre: productoData.nombre,
+        cantidad
       });
   
     } catch (error) {
@@ -84,6 +87,8 @@
       });
     }
   };
+
+  
   </script>
   <style scoped>
   .btn-secundary {
