@@ -56,15 +56,22 @@
       </ul>
     </nav>
 
+   
     <!-- Modal -->
     <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
-      <div class="modal">
-        <ul class="modal-options">
-          <li @click="goToOrders">Mis pedidos</li>
-          <li @click="goToSettings">Ajustes</li>
-        </ul>
-      </div>
+    <div class="modal">
+      <ul class="modal-options">
+        <!-- Opción para ir a Mis pedidos -->
+        <li @click="goToOrders">Mis pedidos</li>
+        
+        <!-- Opción para ir a Ajustes -->
+        <li @click="goToSettings">Ajustes</li>
+
+        <!-- Opción para ir a Admin Dashboard -->
+        <li @click="goToAdminDashboard">Admin Dashboard</li>
+      </ul>
     </div>
+  </div>
   </header>
 </template>
 
@@ -122,6 +129,11 @@ const goToSettings = () => {
   router.push("/ajustes");
 };
 
+const goToAdminDashboard = () => {
+  router.push('/admin-dashboard'); // Redirige a Admin Dashboard
+  toggleModal(); // Cierra el modal
+};
+  
 onMounted(() => {
   // Escuchar cambios de autenticación
   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
