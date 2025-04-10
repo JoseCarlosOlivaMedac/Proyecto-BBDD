@@ -269,11 +269,11 @@ h1{
   text-align: center;
   margin: 2rem 0;
   font-size: 2.5rem;
-  color: #333;
+  color: var(--color-text);
 }
 .wrapper {
   padding: 2rem;
-  background-color: #f8f9fa;
+  background-color: var(--color-content-background);
   min-height: 100vh;
 }
 
@@ -299,7 +299,7 @@ h1{
 }
 
 .producto {
-  background: white;
+  background: var(--color-card-background);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -335,13 +335,13 @@ h1{
 
 .producto-nombre {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: var(--color-text);
   font-size: 1.1rem;
 }
 
 .producto-descripcion {
   margin: 0 0 0.5rem 0;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -352,7 +352,7 @@ h1{
 .producto-precio {
   margin: 0;
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--color-text-price);
   font-size: 1.2rem;
 }
 
@@ -427,7 +427,7 @@ h1{
 
 .pagination span {
   font-size: 1rem;
-  color: #333;
+  color: var(--color-text);
 }
 
 .modo-selector {
@@ -443,7 +443,7 @@ h1{
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  background-color: #f1f1f1;
+  background-color: var(--color-card-background);
   border-radius: 12px;
   padding: 1rem;
   width: 120px;
@@ -454,7 +454,6 @@ h1{
 
 .modo-opcion:hover {
   transform: scale(1.05);
-  background-color: #e4e4e4;
 }
 
 .modo-opcion.activo {

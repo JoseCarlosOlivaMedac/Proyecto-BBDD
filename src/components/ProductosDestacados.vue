@@ -147,7 +147,7 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  background-color: #333;
+  background-color: var(--color-background);
   margin: 1rem 0;
   padding: 2rem 0;
 }
@@ -170,7 +170,7 @@ h2 {
 .producto {
   width: 300px;
   height: 420px;
-  background: #fff;
+  background: var(--color-card-background);
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   padding: 1rem;
@@ -207,12 +207,12 @@ h2 {
 .producto h3 {
   font-size: 1.4rem;
   margin: 1rem 0 0.5rem;
-  color: #222;
+  color: var(--color-text);
 }
 
 .producto p {
   font-size: 1rem;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 0.8rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -223,7 +223,7 @@ h2 {
 .precio {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #222;
+  color: var(--color-text-price);
   margin-bottom: 1rem;
 }
 

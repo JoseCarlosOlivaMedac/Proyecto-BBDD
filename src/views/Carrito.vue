@@ -199,7 +199,7 @@ const cerrarFormulario = () => {
 <style scoped>
 
 .carrito {
-  background-color: #f4f7f6;
+  background-color: var(--color-content-background);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -218,7 +218,7 @@ const cerrarFormulario = () => {
 
 .carrito-header h2 {
   font-size: 2rem;
-  color: #333;
+  color: var(--color-text);
 }
 
 .vacío {
@@ -233,7 +233,7 @@ const cerrarFormulario = () => {
 }
 
 .producto-item {
-  background: #fff;
+  background: var(--color-card-background);
   padding: 1.2rem;
   display: flex;
   gap: 1rem;
@@ -259,13 +259,18 @@ const cerrarFormulario = () => {
 .producto-info h3 {
   font-size: 1.3rem;
   margin: 0.5rem 0;
-  color: #222;
+  color: var(--color-text);
 }
 
 .descripcion {
   font-size: 1rem;
   color: #777;
   margin-bottom: 1rem;
+}
+
+input[type="number"]{
+  background-color: var(--color-input-background);
+  color: var(--color-text);
 }
 
 .cantidad-precio {
@@ -286,7 +291,7 @@ const cerrarFormulario = () => {
 .precio {
   font-size: 1.3rem;
   font-weight: bold;
-  color: #222;
+  color: var(--color-text);
 }
 
 .btn-eliminar {
@@ -345,7 +350,7 @@ const cerrarFormulario = () => {
 }
 
 .form-compra {
-  background: white;
+  background: var(--color-card-background);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);

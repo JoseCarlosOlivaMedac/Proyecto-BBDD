@@ -91,13 +91,6 @@
     if (modoOscuroGuardado) {
       document.documentElement.classList.add("modo-oscuro");
     }
-    onMounted(() => {
-  const modoOscuroGuardado = localStorage.getItem("modoOscuro") === "true";
-  modoOscuro.value = modoOscuroGuardado;
-  if (modoOscuroGuardado) {
-    document.documentElement.classList.add("modo-oscuro");
-  }
-});
   
     // Cargar idioma desde localStorage
     const idiomaGuardado = localStorage.getItem("idioma") || "es";
@@ -112,6 +105,7 @@
     height: 68vh;
     margin: 0 auto;
     background-color: var(--color-background);
+    background-color: var(--color-content-background);
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
@@ -119,6 +113,7 @@
   h1 {
     text-align: center;
     color: var(--color-primary);
+    font-size: 35px;
     margin-bottom: 2rem;
   }
   
@@ -197,7 +192,7 @@
   button {
     padding: 0.5rem 1rem;
     background-color: #5c36f2;
-    color: rgb(0, 0, 0);
+    color: var(--color-text);
     border: none;
     border-radius: 6px;
     margin-left: 10px;
@@ -209,11 +204,29 @@
   button:hover {
     background-color: var(--color-secondary);
   }
-  
-  /* Modo oscuro no funciona xD */
+  </style>
+
+  <style>
+  /* Modo oscuro */
+  :root{
+    --color-background: #f4f7f6;
+    --color-content-background: #fff;
+    --color-card-background: #fff;
+    --color-input-background: #f4f7f6;
+    --color-primary: #5c36f2;
+    --color-secondary: #e67d00;
+    --color-text: #333;
+    --color-text-price: #2c3e50;
+    --color-text-secondary: #666;
+  }
   .modo-oscuro {
     --color-background: #222;
+    --color-content-background:#333;
+    --color-card-background: #4d4c4c;
+    --color-input-background: #686767;
     --color-text: #f4f7f6;
+    --color-text-price: #e0dede;
+    --color-text-secondary: #f3eeeeba;
     --color-primary: #5c36f2;
     --color-secondary: #e67d00;
     background-color: var(--color-background);
